@@ -31,21 +31,6 @@ class ExampleScene extends Phaser.Scene {
 	create() {
 		this.physics.world.checkCollision.down = false;
 
-		this.ball = this.add.sprite(
-			this.scale.width / 2,
-			this.scale.height - 25,
-			'ball');
-		this.physics.add.existing(this.ball);
-		this.ball.body.setCollideWorldBounds(true, 1, 1);
-		this.ball.body.setBounce(1);
-		this.ball.anims.create({
-			key: 'wobble',
-			frameRate: 24,
-			frames: this.anims.generateFrameNumbers('wobble',{
-				frames: [0, 1, 0, 2, 0, 1, 0, 0, 2, 0],
-			}),
-		});
-
 		this.paddle = this.add.sprite(
 			this.scale.width * 0.5,
 			this.scale.height - 5,
@@ -54,8 +39,6 @@ class ExampleScene extends Phaser.Scene {
 		this.physics.add.existing(this.paddle);
 		this.paddle.setOrigin(0.5, 1);
 		this.paddle.body.setImmovable(true);
-
-		this.initBricks();
 
 		this.scoreText = this.add.text(5, 5, 'Points: 0', this.textStyle);
 
@@ -66,6 +49,7 @@ class ExampleScene extends Phaser.Scene {
 			this.textStyle,
 		);
 		this.livesText.setOrigin(1, 0);
+
 		this.lifeLostText = this.add.text(
 			this.scale.width / 2,
 			this.scale.height / 2,
@@ -110,6 +94,8 @@ class ExampleScene extends Phaser.Scene {
 			},
 			this,
 		);
+
+		this.initGame();
 	}
 	update() {
 		this.physics.collide(this.ball, this.paddle, (ball, paddle) =>
@@ -118,8 +104,9 @@ class ExampleScene extends Phaser.Scene {
 		this.physics.collide(this.ball, this.bricks, (ball, brick) =>
 			this.hitBrick(ball, brick),
 		);
+
 		if (this.playing) {
-			this.paddle.x = this.input.x || this.scale.width * 0.5
+			this.paddle.x = this.input.x || this.scale.width / 2
 		}
 
 		const ballIsOutOfBounds = !Phaser.Geom.Rectangle.Overlaps(
@@ -128,14 +115,52 @@ class ExampleScene extends Phaser.Scene {
 		);
 
 		if (this.bricks.countActive() === 0) {
-			//alert('You won the game, congratulations!');
-			location.reload();
+			this.initGame();
 		}
 
 		if (ballIsOutOfBounds) {
 			this.ballLeaveScreen();
 		}
 	}
+
+	initGame() {
+		if (this.ball) {
+			this.ball.destroy();
+		}
+		if (this.bricks) {
+			this.bricks.destroy();
+		}
+
+		this.startButton.visible = true;
+		this.lives = 3;
+		this.score = 0;
+		this.playing = false;
+		this.paddle.x = this.scale.width / 2;
+
+		this.initBall();
+		this.initBricks();
+
+		this.scoreText.setText('Points: ' + this.score);
+		this.livesText.setText('Lives: ' + this.lives);
+	}
+
+	initBall() {
+		this.ball = this.add.sprite(
+				this.scale.width / 2,
+				this.scale.height - 25,
+				'ball');
+		this.physics.add.existing(this.ball);
+		this.ball.body.setCollideWorldBounds(true, 1, 1);
+		this.ball.body.setBounce(1);
+		this.ball.anims.create({
+			key: 'wobble',
+			frameRate: 24,
+			frames: this.anims.generateFrameNumbers('wobble',{
+				frames: [0, 1, 0, 2, 0, 1, 0, 2, 0],
+			}),
+		});	
+	}
+
 	initBricks() {
 		const bricksLayout = {
 			width: 50,
@@ -165,10 +190,12 @@ class ExampleScene extends Phaser.Scene {
 			}
 		}
 	}
+
 	hitPaddle(ball, paddle) {
 		this.ball.anims.play('wobble');
 		ball.body.velocity.x = -5 * (paddle.x - ball.x);
 	}
+
 	hitBrick(ball, brick) {
 		const destroyTween = this.tweens.add({
 			targets: brick,
@@ -188,6 +215,7 @@ class ExampleScene extends Phaser.Scene {
 		this.score += 10;
 		this.scoreText.setText('Points: ' + this.score);
 	}
+
 	ballLeaveScreen() {
 		this.lives--;
 		if (this.lives > 0) {
@@ -203,11 +231,12 @@ class ExampleScene extends Phaser.Scene {
 				this,
 			);
 		} else {
-			location.reload();
+			this.initGame();
 		}
 	}
+
 	startGame() {
-		this.startButton.destroy();
+		this.startButton.visible = false;
 		this.ball.body.velocity.set(150, -150);
 		this.playing = true;
 	}
