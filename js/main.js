@@ -114,8 +114,9 @@ class ExampleScene extends Phaser.Scene {
 			this.ball.getBounds()
 		);
 
+		// アクティブなブロックがない = ステージクリア
 		if (this.bricks.countActive() === 0) {
-			this.initGame();
+			this.initGame(true);
 		}
 
 		if (ballIsOutOfBounds) {
@@ -123,12 +124,22 @@ class ExampleScene extends Phaser.Scene {
 		}
 	}
 
-	initGame() {
+	initGame(isCleared) {
+		if (isCleared === undefined) { isCleared = false; }
+
 		if (this.ball) {
 			this.ball.destroy();
 		}
-		if (this.bricks) {
-			this.bricks.destroy();
+
+		if (isCleared) {
+			this.bricks.destroy(true);
+			this.initBricks();
+		} else if (!this.playing) {
+			this.initBricks();
+		} else {
+			this.bricks.children.iterate(brick => {
+				brick.enableBody(false, 0, 0, true, true);
+			})
 		}
 
 		this.startButton.visible = true;
@@ -138,7 +149,6 @@ class ExampleScene extends Phaser.Scene {
 		this.paddle.x = this.scale.width / 2;
 
 		this.initBall();
-		this.initBricks();
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
@@ -183,8 +193,7 @@ class ExampleScene extends Phaser.Scene {
 				const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
 				const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
 
-				const newBrick = this.add.sprite(brickX, brickY, 'brick');
-				this.physics.add.existing(newBrick);
+				const newBrick = this.physics.add.sprite(brickX, brickY, 'brick');
 				newBrick.body.setImmovable(true);
 				this.bricks.add(newBrick);
 			}
@@ -197,20 +206,7 @@ class ExampleScene extends Phaser.Scene {
 	}
 
 	hitBrick(ball, brick) {
-		const destroyTween = this.tweens.add({
-			targets: brick,
-			ease: 'Linear',
-			repeat: 0,
-			duration: 200,
-			props: {
-				scaleX: 0,
-				scaleY: 0,
-			},
-			onComplete() {
-				brick.destroy();
-			},
-		});
-		destroyTween.play();
+		brick.disableBody(true, true);
 
 		this.score += 10;
 		this.scoreText.setText('Points: ' + this.score);
