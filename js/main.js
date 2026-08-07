@@ -96,6 +96,7 @@ class ExampleScene extends Phaser.Scene {
 		);
 
 		this.initGame();
+		this.initBricks();
 	}
 	update() {
 		this.physics.collide(this.ball, this.paddle, (ball, paddle) =>
