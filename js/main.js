@@ -1,3 +1,6 @@
+import {Ball} from './ball.js';
+import {BrickGroup} from './brickGroup.js';
+
 class ExampleScene extends Phaser.Scene {
 	ball;
 	paddle;
@@ -19,15 +22,12 @@ class ExampleScene extends Phaser.Scene {
 		this.load.image('ball', 'img/ball.png');
 		this.load.image('paddle', 'img/paddle.png');
 		this.load.image('brick', 'img/brick.png');
-		this.load.spritesheet('wobble', 'img/wobble.png',{
-			frameWidth: 20,
-			frameHeight: 20,
-		});
 		this.load.spritesheet('button', 'img/button.png', {
 			frameWidth: 120,
 			frameHeight: 40,
 		});
 	}
+	
 	create() {
 		this.physics.world.checkCollision.down = false;
 
@@ -95,9 +95,11 @@ class ExampleScene extends Phaser.Scene {
 			this,
 		);
 
+		this.bricks = new BrickGroup(this);
+
 		this.initGame();
-		this.initBricks();
 	}
+	
 	update() {
 		this.physics.collide(this.ball, this.paddle, (ball, paddle) =>
 			this.hitPaddle(ball, paddle),
@@ -133,10 +135,10 @@ class ExampleScene extends Phaser.Scene {
 		}
 
 		if (isCleared) {
-			this.bricks.destroy(true);
-			this.initBricks();
+			this.bricks.clear();
+			this.bricks.initBricks();
 		} else if (!this.playing) {
-			this.initBricks();
+			this.bricks.initBricks();
 		} else {
 			this.bricks.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
@@ -156,54 +158,15 @@ class ExampleScene extends Phaser.Scene {
 	}
 
 	initBall() {
-		this.ball = this.add.sprite(
-				this.scale.width / 2,
-				this.scale.height - 25,
-				'ball');
-		this.physics.add.existing(this.ball);
-		this.ball.body.setCollideWorldBounds(true, 1, 1);
-		this.ball.body.setBounce(1);
-		this.ball.anims.create({
-			key: 'wobble',
-			frameRate: 24,
-			frames: this.anims.generateFrameNumbers('wobble',{
-				frames: [0, 1, 0, 2, 0, 1, 0, 2, 0],
-			}),
-		});	
-	}
-
-	initBricks() {
-		const bricksLayout = {
-			width: 50,
-			height: 20,
-			count: {
-				row: 3,
-				col: 7,
-			},
-			offset: {
-				top: 50,
-				left: 60,
-			},
-			padding: 10,
-		};
-
-		this.bricks = this.add.group();
-
-		for (let c = 0; c < bricksLayout.count.col; c++) {
-			for (let r = 0; r < bricksLayout.count.row; r++) {
-				const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
-				const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
-
-				const newBrick = this.physics.add.sprite(brickX, brickY, 'brick');
-				newBrick.body.setImmovable(true);
-				this.bricks.add(newBrick);
-			}
-		}
+		this.ball = new Ball(
+			this,
+			this.scale.width / 2,
+			this.scale.height - 25
+		);
 	}
 
 	hitPaddle(ball, paddle) {
-		this.ball.anims.play('wobble');
-		ball.body.velocity.x = -5 * (paddle.x - ball.x);
+		ball.hitPaddle(paddle);
 	}
 
 	hitBrick(ball, brick) {
