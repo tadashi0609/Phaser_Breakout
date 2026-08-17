@@ -4,7 +4,7 @@ import {BallGroup} from './ballGroup.js';
 
 class ExampleScene extends Phaser.Scene {
 	paddle;
-	bricks;
+	brickGroup;
 	ballGroup;
 
 	scoreText;
@@ -97,7 +97,7 @@ class ExampleScene extends Phaser.Scene {
 		);
 
 		this.ballGroup = new BallGroup(this);
-		this.bricks = new BrickGroup(this);
+		this.brickGroup = new BrickGroup(this);
 
 		this.initGame();
 	}
@@ -106,7 +106,7 @@ class ExampleScene extends Phaser.Scene {
 		this.physics.collide(this.ballGroup, this.paddle, (ball, paddle) =>
 			this.hitPaddle(ball, paddle),
 		);
-		this.physics.collide(this.ballGroup, this.bricks, (ball, brick) =>
+		this.physics.collide(this.ballGroup, this.brickGroup, (ball, brick) =>
 			this.hitBrick(ball, brick),
 		);
 
@@ -115,7 +115,7 @@ class ExampleScene extends Phaser.Scene {
 		}
 
 		// アクティブなブロックがない = ステージクリア
-		if (this.bricks.countActive() === 0) {
+		if (this.brickGroup.countActive() === 0) {
 			this.initGame(true);
 		}
 
@@ -128,15 +128,15 @@ class ExampleScene extends Phaser.Scene {
 		if (isCleared === undefined) { isCleared = false; }
 
 		if (isCleared) {
-			this.bricks.clear();
-			this.bricks.initBricks();
+			this.brickGroup.clear();
+			this.brickGroup.initBricks();
 			this.ballGroup.children.iterate(ball => {
 				ball.removeBall();
 			})
 		} else if (!this.playing) {
-			this.bricks.initBricks();
+			this.brickGroup.initBricks();
 		} else {
-			this.bricks.children.iterate(brick => {
+			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
 			})
 		}
