@@ -1,10 +1,11 @@
 import {Ball} from './ball.js';
 import {BrickGroup} from './brickGroup.js';
+import {BallGroup} from './ballGroup.js';
 
 class ExampleScene extends Phaser.Scene {
-	ball;
 	paddle;
 	bricks;
+	ballGroup;
 
 	scoreText;
 	score = 0;
@@ -27,7 +28,7 @@ class ExampleScene extends Phaser.Scene {
 			frameHeight: 40,
 		});
 	}
-	
+
 	create() {
 		this.physics.world.checkCollision.down = false;
 
@@ -95,16 +96,17 @@ class ExampleScene extends Phaser.Scene {
 			this,
 		);
 
+		this.ballGroup = new BallGroup(this);
 		this.bricks = new BrickGroup(this);
 
 		this.initGame();
 	}
 	
 	update() {
-		this.physics.collide(this.ball, this.paddle, (ball, paddle) =>
+		this.physics.collide(this.ballGroup, this.paddle, (ball, paddle) =>
 			this.hitPaddle(ball, paddle),
 		);
-		this.physics.collide(this.ball, this.bricks, (ball, brick) =>
+		this.physics.collide(this.ballGroup, this.bricks, (ball, brick) =>
 			this.hitBrick(ball, brick),
 		);
 
@@ -112,17 +114,12 @@ class ExampleScene extends Phaser.Scene {
 			this.paddle.x = this.input.x || this.scale.width / 2
 		}
 
-		const ballIsOutOfBounds = !Phaser.Geom.Rectangle.Overlaps(
-			this.physics.world.bounds,
-			this.ball.getBounds()
-		);
-
 		// アクティブなブロックがない = ステージクリア
 		if (this.bricks.countActive() === 0) {
 			this.initGame(true);
 		}
 
-		if (ballIsOutOfBounds) {
+		if (this.ballGroup.countActive() === 0) {
 			this.ballLeaveScreen();
 		}
 	}
@@ -130,13 +127,12 @@ class ExampleScene extends Phaser.Scene {
 	initGame(isCleared) {
 		if (isCleared === undefined) { isCleared = false; }
 
-		if (this.ball) {
-			this.ball.destroy();
-		}
-
 		if (isCleared) {
 			this.bricks.clear();
 			this.bricks.initBricks();
+			this.ballGroup.children.iterate(ball => {
+				ball.removeBall();
+			})
 		} else if (!this.playing) {
 			this.bricks.initBricks();
 		} else {
@@ -151,18 +147,10 @@ class ExampleScene extends Phaser.Scene {
 		this.playing = false;
 		this.paddle.x = this.scale.width / 2;
 
-		this.initBall();
+		this.ballGroup.initBall();
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
-	}
-
-	initBall() {
-		this.ball = new Ball(
-			this,
-			this.scale.width / 2,
-			this.scale.height - 25
-		);
 	}
 
 	hitPaddle(ball, paddle) {
@@ -179,14 +167,15 @@ class ExampleScene extends Phaser.Scene {
 	ballLeaveScreen() {
 		this.lives--;
 		if (this.lives > 0) {
+			let ball = this.ballGroup.initBall();
+
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
-			this.ball.body.reset(this.scale.width / 2, this.scale.height - 25);
 			this.input.once(
 				'pointerdown',
 				() => {
 					this.lifeLostText.visible = false;
-					this.ball.body.velocity.set(150, -150);
+					ball.body.velocity.set(150, -150);
 				},
 				this,
 			);
@@ -197,7 +186,7 @@ class ExampleScene extends Phaser.Scene {
 
 	startGame() {
 		this.startButton.visible = false;
-		this.ball.body.velocity.set(150, -150);
+		this.ballGroup.getChildren()[0].body.velocity.set(150, -150);
 		this.playing = true;
 	}
 }

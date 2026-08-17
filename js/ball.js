@@ -1,10 +1,8 @@
 export class Ball extends Phaser.Physics.Arcade.Sprite {
-    scene;
-
     constructor(scene, x, y) {
         super(scene, x, y, 'ball');
         this.scene = scene;
-        scene.events.on('update', this.update, this);
+        // scene.events.on('update', this.update, this);
 
         this.scene.physics.add.existing(this);
         this.scene.add.existing(this);
@@ -18,18 +16,19 @@ export class Ball extends Phaser.Physics.Arcade.Sprite {
     }
 
     update() {
-		// const ballIsOutOfBounds = !Phaser.Geom.Rectangle.Overlaps(
-		// 	this.scene.physics.world.bounds,
-		// 	this.getBounds()
-		// );
+		const ballIsOutOfBounds = !Phaser.Geom.Rectangle.Overlaps(
+			this.scene.physics.world.bounds,
+			this.getBounds()
+		);
 
-        // if (ballIsOutOfBounds) {
-        //     this.leaveScreen();
-        // }
+        if (ballIsOutOfBounds) {
+            this.removeBall();
+        }
     }
 
-    leaveScreen() {
-        this.destroy();
+    removeBall() {
+        // this.scene.events.off('update', this.update)
+        this.destroy(true);
     }
 
     hitPaddle(paddle) {

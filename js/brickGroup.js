@@ -38,8 +38,6 @@ export class BrickGroup extends Phaser.GameObjects.Group {
 				this.add(newBrick);
 			}
 		}
-
-        console.log(this);
     }
 
 }
