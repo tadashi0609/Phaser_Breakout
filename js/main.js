@@ -103,11 +103,16 @@ class ExampleScene extends Phaser.Scene {
 	}
 	
 	update() {
-		this.physics.collide(this.ballGroup, this.paddle, (ball, paddle) =>
-			this.hitPaddle(ball, paddle),
+		this.physics.collide(
+			this.ballGroup.getChildren(),
+			this.paddle,
+			(ball, paddle) => this.hitPaddle(ball, paddle)
 		);
-		this.physics.collide(this.ballGroup, this.brickGroup, (ball, brick) =>
-			this.hitBrick(ball, brick),
+
+		this.physics.collide(
+			this.ballGroup.getChildren(),
+			this.brickGroup.getChildren(),
+			(ball, brick) => this.hitBrick(ball, brick)
 		);
 
 		if (this.playing) {
@@ -122,16 +127,15 @@ class ExampleScene extends Phaser.Scene {
 		if (this.ballGroup.countActive() === 0) {
 			this.ballLeaveScreen();
 		}
+
 	}
 
-	initGame(isCleared) {
-		if (isCleared === undefined) { isCleared = false; }
-
-		if (isCleared) {
+	initGame(cleared = false) {
+		if (cleared) {
 			this.brickGroup.clear();
 			this.brickGroup.initBricks();
 			this.ballGroup.children.iterate(ball => {
-				ball.removeBall();
+				ball.destroy();
 			})
 		} else if (!this.playing) {
 			this.brickGroup.initBricks();
@@ -151,6 +155,7 @@ class ExampleScene extends Phaser.Scene {
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
+
 	}
 
 	hitPaddle(ball, paddle) {

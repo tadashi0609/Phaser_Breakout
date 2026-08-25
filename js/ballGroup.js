@@ -1,12 +1,18 @@
 import {Ball} from './ball.js';
 
-export class BallGroup extends Phaser.GameObjects.Group {
+export class BallGroup extends Phaser.Physics.Arcade.Group {
     constructor(scene) {
-        super(scene);
-        this.scene.events.on('update', this.update, this);
+        super(scene.physics.world, scene, {
+            collideWorldBounds: true,
+            bounceX: 1,
+            bounceY: 1,
+        });
 
         this.scene.add.existing(this);
+        this.scene.physics.add.existing(this);
         this.runChildUpdate = true;
+
+        this.initBall();
     }
 
     update() {
@@ -16,14 +22,19 @@ export class BallGroup extends Phaser.GameObjects.Group {
     initBall() {
         this.clear(true, true);
 
-        const newBall = new Ball(
-            this.scene,
-            this.scene.scale.width / 2,
-			this.scene.scale.height - 25,
-        );
+        const newBallArray = this.createMultiple({
+            classType: Ball,
+            frameQuatity: 1,
+            active: true,
+            visible: true,
+            setXY: {
+                x : this.scene.scale.width / 2,
+			    y : this.scene.scale.height - 25,
+            },
+            key: 'ball'
+        });
 
-        this.add(newBall);
-        return newBall;
+        return newBallArray[0];
     }
 
     increaseBall(x, y, velocityX, velocityY) {

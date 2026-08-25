@@ -1,10 +1,11 @@
-export class BrickGroup extends Phaser.GameObjects.Group {
+export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 
     constructor(scene) {
-        super(scene);
-        this.scene.events.on('update', this.update, this);
+        super(scene.physics.world, scene);
+        // this.scene.events.on('update', this.update, this);
 
         this.scene.add.existing(this);
+		this.scene.physics.add.existing(this);
     }
 
     update() {
