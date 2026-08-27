@@ -15,12 +15,16 @@ export class Ball extends Phaser.Physics.Arcade.Sprite {
 		);
 
         if (ballIsOutOfBounds && this.active) {
-            this.removeBall();
+            this.resetBall();
         }
     }
 
-    removeBall() {
-        this.destroy(true);
+    resetBall() {
+        this.x = this.scene.scale.width / 2;
+        this.y = this.scene.scale.height - 30;
+        this.setActive(false);
+        this.setVisible(false);
+        this.body.setVelocity(0, 0);
     }
 
     hitPaddle(paddle) {
