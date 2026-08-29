@@ -100,7 +100,7 @@ class ExampleScene extends Phaser.Scene {
 			(ball, brick) => this.hitBrick(ball, brick)
 		);
 
-		this.paddle.x = this.input.x;
+		this.paddle.x = this.input.x || this.scale.width / 2;
 		if (this.paddle.x - this.paddle.width / 2 < 0) {
 			this.paddle.x = this.paddle.width / 2;
 		} else if (this.paddle.x + this.paddle.width / 2 > this.scale.width) {
@@ -174,7 +174,9 @@ class ExampleScene extends Phaser.Scene {
 				() => {
 					this.lifeLostText.visible = false;
 					this.playing = true;
-					this.firstBall.body.velocity.set(150, -150);
+
+					const newVelocity = this.calcBallVelocity();
+					this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
 				},
 				this,
 			);
@@ -185,8 +187,24 @@ class ExampleScene extends Phaser.Scene {
 
 	startGame() {
 		this.startText.visible = false;
-		this.firstBall.body.velocity.set(150, -150);
 		this.playing = true;
+
+		const newVelocity = this.calcBallVelocity();
+		this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+	}
+
+	calcBallVelocity() {
+		const ballPos = new Phaser.Math.Vector2(this.firstBall.x, this.firstBall.y);
+		const targetPos = new Phaser.Math.Vector2(
+			this.scale.width - this.firstBall.x,
+			this.scale.height / 2
+		);
+
+		const newVelocity = targetPos.subtract(ballPos);
+		newVelocity.normalize();
+		newVelocity.scale(200);
+
+		return newVelocity;
 	}
 }
 
