@@ -7,6 +7,8 @@ class ExampleScene extends Phaser.Scene {
 	brickGroup;
 	ballGroup;
 
+	firstBall;
+
 	scoreText;
 	score = 0;
 
@@ -15,7 +17,7 @@ class ExampleScene extends Phaser.Scene {
 	lifeLostText;
 
 	playing = false;
-	startButton;
+	startText;
 
 	textStyle = { font: '18px Arial', fill: '#0095dd'};
 
@@ -60,37 +62,18 @@ class ExampleScene extends Phaser.Scene {
 		this.lifeLostText.setOrigin(0.5, 0.5);
 		this.lifeLostText.visible = false;
 
-		this.startButton = this.add.sprite(
+		this.startText = this.add.text(
 			this.scale.width / 2,
 			this.scale.height / 2,
-			'button',
-			0,
+			'Click to Start',
+			this.textStyle,
 		);
-		this.startButton.setInteractive();
-		this.startButton.on(
-			'pointerover',
-			() => {
-				this.startButton.setFrame(1);
-			},
-			this,
-		);
-		this.startButton.on(
+		this.startText.setOrigin(0.5, 0.5);
+
+		this.input.on(
 			'pointerdown',
 			() => {
-				this.startButton.setFrame(2);
-			},
-			this,
-		);
-		this.startButton.on(
-			'pointerout',
-			() => {
-				this.startButton.setFrame(0);
-			},
-			this,
-		);
-		this.startButton.on(
-			'pointerup',
-			() => {
+				this.startText.visible = false;
 				this.startGame();
 			},
 			this,
@@ -117,8 +100,16 @@ class ExampleScene extends Phaser.Scene {
 			(ball, brick) => this.hitBrick(ball, brick)
 		);
 
-		if (this.playing) {
-			this.paddle.x = this.input.x || this.scale.width / 2
+		this.paddle.x = this.input.x;
+		if (this.paddle.x - this.paddle.width / 2 < 0) {
+			this.paddle.x = this.paddle.width / 2;
+		} else if (this.paddle.x + this.paddle.width / 2 > this.scale.width) {
+			this.paddle.x = this.scale.width - this.paddle.width / 2;
+		}
+
+		if (!this.playing) {
+			this.firstBall.x = this.paddle.x;
+			this.firstBall.y = this.paddle.y - this.paddle.height - this.firstBall.height / 2;
 		}
 
 		// アクティブなブロックがない = ステージクリア
@@ -136,21 +127,19 @@ class ExampleScene extends Phaser.Scene {
 		if (cleared) {
 			this.brickGroup.clear();
 			this.brickGroup.initBricks();
-		} else if (!this.playing) {
-			this.brickGroup.initBricks();
 		} else {
 			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
 			})
 		}
 
-		this.startButton.visible = true;
+		this.startText.visible = true;
 		this.lives = 3;
 		this.score = 0;
 		this.playing = false;
 		this.paddle.x = this.scale.width / 2;
 
-		this.ballGroup.initBall(this.paddle);
+		this.firstBall = this.ballGroup.initBall(this.paddle);
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
@@ -175,26 +164,28 @@ class ExampleScene extends Phaser.Scene {
 	ballLeaveScreen() {
 		this.lives--;
 		if (this.lives > 0) {
-			let ball = this.ballGroup.initBall(this.paddle);
+			this.firstBall = this.ballGroup.initBall(this.paddle);
 
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
+			this.playing = false;
 			this.input.once(
 				'pointerdown',
 				() => {
 					this.lifeLostText.visible = false;
-					ball.body.velocity.set(150, -150);
+					this.playing = true;
+					this.firstBall.body.velocity.set(150, -150);
 				},
 				this,
 			);
 		} else {
-			this.initGame();
+			this.scene.restart();
 		}
 	}
 
 	startGame() {
-		this.startButton.visible = false;
-		this.ballGroup.getChildren()[0].body.velocity.set(150, -150);
+		this.startText.visible = false;
+		this.firstBall.body.velocity.set(150, -150);
 		this.playing = true;
 	}
 }
