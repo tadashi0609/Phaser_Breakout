@@ -153,7 +153,7 @@ class ExampleScene extends Phaser.Scene {
 	hitBrick(ball, brick) {
 		brick.disableBody(true, true);
 
-		if (Math.random() > 0.3) {
+		if (Math.random() < 0.2) {
 			this.ballGroup.increaseBall();
 		}
 

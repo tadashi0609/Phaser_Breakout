@@ -45,13 +45,18 @@ export class BallGroup extends Phaser.Physics.Arcade.Group {
     }
 
     increaseBall() {
-        if (this.getMatching('active', true).length * 2 < this.MAX_BALL_COUNT) {
+        if (this.getMatching('active', true).length * 3 < this.MAX_BALL_COUNT) {
             for (const ball of this.getMatching('active', true)) {
-                let newBall = this.getFirstDead(false, ball.x, ball.y);
+                for (let i = 0; i < 2; i++) {
+                    let newBall = this.getFirstDead(false, ball.x, ball.y);
 
-                newBall.setActive(true);
-                newBall.setVisible(true);
-                newBall.body.setVelocity(ball.body.velocity.x - 10, ball.body.velocity.y);
+                    newBall.setActive(true);
+                    newBall.setVisible(true);
+
+                    //+-30度回転させたベクトルを使う
+                    const newVelocity = ball.body.velocity.clone().rotate(((-1) ** i) * Math.PI / 6)
+                    newBall.body.setVelocity(newVelocity.x, newVelocity.y);
+                }
             }            
         }
 
