@@ -28,6 +28,7 @@ export class Ball extends Phaser.Physics.Arcade.Sprite {
     }
 
     hitPaddle(paddle) {
-        this.body.velocity.x = -5 * (paddle.x - this.x);        
+        this.body.setVelocity(0, -200);
+        this.body.velocity.rotate((this.x - paddle.x) / (paddle.width + this.width) * Math.PI / 6 * 5);
     }
 }
