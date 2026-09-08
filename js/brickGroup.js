@@ -12,7 +12,9 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 
     }
 
-    initBricks() {
+    initBricks(layoutData) {
+		let brickCount = 0;
+
 		const bricksLayout = {
 			width: 50,
 			height: 20,
@@ -27,18 +29,24 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 			padding: 10,
 		};
 
-		for (let c = 0; c < bricksLayout.count.col; c++) {
-			for (let r = 0; r < bricksLayout.count.row; r++) {
-				const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
-				const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
+		for (let r in layoutData.layout) {
+			for (let c in layoutData.layout[r]) {
+				if (layoutData.layout[r][c]){
+					const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
+					const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
 
-				const newBrick = this.scene.physics.add.sprite(brickX, brickY, 'brick');
-                this.scene.add.existing(newBrick);
-                this.scene.physics.add.existing(newBrick);
-				newBrick.body.setImmovable(true);
-				this.add(newBrick);
+					const newBrick = this.scene.physics.add.sprite(brickX, brickY, 'brick');
+					this.scene.add.existing(newBrick);
+					this.scene.physics.add.existing(newBrick);
+					newBrick.body.setImmovable(true);
+					this.add(newBrick);
+
+					brickCount++;
+				}
 			}
 		}
+
+		return brickCount;
     }
 
 }

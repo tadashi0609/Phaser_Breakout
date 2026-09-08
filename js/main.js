@@ -29,6 +29,8 @@ class ExampleScene extends Phaser.Scene {
 			frameWidth: 120,
 			frameHeight: 40,
 		});
+
+		this.load.json('level', 'json/level0.json');
 	}
 
 	create() {
@@ -126,7 +128,7 @@ class ExampleScene extends Phaser.Scene {
 	initGame(cleared = false) {
 		if (cleared) {
 			this.brickGroup.clear();
-			this.brickGroup.initBricks();
+			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
 			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
