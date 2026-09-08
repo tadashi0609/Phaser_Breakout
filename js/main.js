@@ -188,11 +188,13 @@ class ExampleScene extends Phaser.Scene {
 	}
 
 	startGame() {
-		this.startText.visible = false;
-		this.playing = true;
+		if (!this.playing) {
+			this.startText.visible = false;
+			this.playing = true;
 
-		const newVelocity = this.calcBallVelocity();
-		this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+			const newVelocity = this.calcBallVelocity();
+			this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+		}
 	}
 
 	calcBallVelocity() {
