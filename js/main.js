@@ -1,11 +1,13 @@
 import {Ball} from './ball.js';
 import {BrickGroup} from './brickGroup.js';
 import {BallGroup} from './ballGroup.js';
+import { Powerup } from './powerup.js';
 
 class ExampleScene extends Phaser.Scene {
 	paddle;
 	brickGroup;
 	ballGroup;
+	powerupGroup;
 
 	firstBall;
 
@@ -28,6 +30,10 @@ class ExampleScene extends Phaser.Scene {
 		this.load.spritesheet('button', 'img/button.png', {
 			frameWidth: 120,
 			frameHeight: 40,
+		});
+		this.load.spritesheet('powerup', 'img/powerup.png', {
+			frameWidth: 20,
+			frameHeight: 20,
 		});
 
 		this.load.json('level', 'json/level0.json');
@@ -83,6 +89,8 @@ class ExampleScene extends Phaser.Scene {
 
 		this.ballGroup = new BallGroup(this);
 		this.brickGroup = new BrickGroup(this);
+		this.powerupGroup = this.physics.add.group();
+		this.powerupGroup.runChildUpdate = true;
 
 		this.initGame();
 	}
@@ -101,6 +109,14 @@ class ExampleScene extends Phaser.Scene {
 			this.brickGroup.getChildren(),
 			(ball, brick) => this.hitBrick(ball, brick)
 		);
+
+		if (this.playing) {
+			this.physics.overlap(
+				this.powerupGroup.getChildren(),
+				this.paddle,
+				(powerup, paddle) => this.getPowerup(powerup, paddle)
+			);
+		}
 
 		this.paddle.x = this.input.x || this.scale.width / 2;
 		if (this.paddle.x - this.paddle.width / 2 < 0) {
@@ -129,10 +145,20 @@ class ExampleScene extends Phaser.Scene {
 		if (cleared) {
 			this.brickGroup.clear();
 			this.brickGroup.initBricks(this.cache.json.get('level'));
+		} else if (!this.playing) {
+			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
 			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
 			})
+		}
+
+		const brickCount = this.brickGroup.countActive();
+
+		this.powerupGroup.clear(true, true);
+		for (let i = 0; i < brickCount * 0.2; i++) {
+			const powerup = new Powerup(this, 0, 0, 0, this.powerupGroup);
+			this.powerupGroup.add(powerup);
 		}
 
 		this.startText.visible = true;
@@ -145,7 +171,6 @@ class ExampleScene extends Phaser.Scene {
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
-
 	}
 
 	hitPaddle(ball, paddle) {
@@ -155,12 +180,28 @@ class ExampleScene extends Phaser.Scene {
 	hitBrick(ball, brick) {
 		brick.disableBody(true, true);
 
-		if (Math.random() < 0.2) {
-			this.ballGroup.increaseBall();
+		if (Math.random() < 0.3 && this.powerupGroup.getFirstDead()) {
+			this.powerupGroup.getFirstDead().startFall(brick.x, brick.y);
 		}
 
 		this.score += 10;
 		this.scoreText.setText('Points: ' + this.score);
+	}
+
+	getPowerup(powerup, paddle) {
+		switch (powerup.type) {
+			case 0:
+				this.ballGroup.increaseBall();
+				break;
+			
+			case 1:
+				break;
+		
+			default:
+				break;
+		}
+		
+		this.powerupGroup.remove(powerup, true, true);
 	}
 
 	ballLeaveScreen() {
@@ -168,9 +209,14 @@ class ExampleScene extends Phaser.Scene {
 		if (this.lives > 0) {
 			this.firstBall = this.ballGroup.initBall(this.paddle);
 
+			this.powerupGroup.children.iterate(powerup => {
+				powerup.body.stop();
+			})
+
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
 			this.playing = false;
+
 			this.input.once(
 				'pointerdown',
 				() => {
@@ -179,6 +225,10 @@ class ExampleScene extends Phaser.Scene {
 
 					const newVelocity = this.calcBallVelocity();
 					this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+
+					this.powerupGroup.children.iterate(powerup => {
+						powerup.startFall()
+					})
 				},
 				this,
 			);
