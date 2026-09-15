@@ -163,8 +163,9 @@ class ExampleScene extends Phaser.Scene {
 		const brickCount = this.brickGroup.countActive();
 
 		this.powerupGroup.clear(true, true);
-		for (let i = 0; i < brickCount * 0.3; i++) {
-			const type = (((-1) ** i) + 1) / 2;
+		for (let i = 0; i < brickCount * 0.25; i++) {
+			let type = (((-1) ** i) + 1) / 2;
+			if (i > brickCount * 0.1) { type = 0; }
 			const powerup = new Powerup(this, 0, 0, type, this.powerupGroup);
 			this.powerupGroup.add(powerup);
 		}
