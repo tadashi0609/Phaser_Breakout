@@ -11,6 +11,8 @@ class ExampleScene extends Phaser.Scene {
 
 	firstBall;
 
+	powerupTimer;
+
 	scoreText;
 	score = 0;
 
@@ -92,6 +94,11 @@ class ExampleScene extends Phaser.Scene {
 		this.powerupGroup = this.physics.add.group();
 		this.powerupGroup.runChildUpdate = true;
 
+		this.powerupTimer = this.add.timeline({
+			at: 10000,
+			run: () => { this.paddle.scaleX = 1; }
+		});
+
 		this.initGame();
 	}
 	
@@ -119,10 +126,10 @@ class ExampleScene extends Phaser.Scene {
 		}
 
 		this.paddle.x = this.input.x || this.scale.width / 2;
-		if (this.paddle.x - this.paddle.width / 2 < 0) {
-			this.paddle.x = this.paddle.width / 2;
-		} else if (this.paddle.x + this.paddle.width / 2 > this.scale.width) {
-			this.paddle.x = this.scale.width - this.paddle.width / 2;
+		if (this.paddle.x - this.paddle.body.width / 2 < 0) {
+			this.paddle.x = this.paddle.body.width / 2;
+		} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
+			this.paddle.x = this.scale.width - this.paddle.body.width / 2;
 		}
 
 		if (!this.playing) {
@@ -156,10 +163,15 @@ class ExampleScene extends Phaser.Scene {
 		const brickCount = this.brickGroup.countActive();
 
 		this.powerupGroup.clear(true, true);
-		for (let i = 0; i < brickCount * 0.2; i++) {
-			const powerup = new Powerup(this, 0, 0, 0, this.powerupGroup);
+		for (let i = 0; i < brickCount * 0.3; i++) {
+			const type = (((-1) ** i) + 1) / 2;
+			const powerup = new Powerup(this, 0, 0, type, this.powerupGroup);
 			this.powerupGroup.add(powerup);
 		}
+
+		this.paddle.scaleX = 1;
+		this.powerupTimer.reset();
+		this.powerupTimer.stop();
 
 		this.startText.visible = true;
 		this.lives = 3;
@@ -195,6 +207,8 @@ class ExampleScene extends Phaser.Scene {
 				break;
 			
 			case 1:
+				this.paddle.scaleX = 2;
+				this.powerupTimer.play();
 				break;
 		
 			default:
@@ -213,6 +227,8 @@ class ExampleScene extends Phaser.Scene {
 				powerup.body.stop();
 			})
 
+			this.powerupTimer.stop();
+
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
 			this.playing = false;
@@ -223,11 +239,15 @@ class ExampleScene extends Phaser.Scene {
 					this.lifeLostText.visible = false;
 					this.playing = true;
 
+					this.powerupTimer.play();
+
 					const newVelocity = this.calcBallVelocity();
 					this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
 
 					this.powerupGroup.children.iterate(powerup => {
-						powerup.startFall()
+						if (powerup.active) {
+							powerup.startFall()
+						}
 					})
 				},
 				this,
