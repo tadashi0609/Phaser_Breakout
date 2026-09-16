@@ -20,8 +20,8 @@ export class Ball extends Phaser.Physics.Arcade.Sprite {
     }
 
     resetBall() {
-        this.x = this.scene.scale.width / 2;
-        this.y = this.scene.scale.height - 30;
+        this.x = 0;
+        this.y = 0;
         this.setActive(false);
         this.setVisible(false);
         this.body.setVelocity(0, 0);

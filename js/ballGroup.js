@@ -19,10 +19,6 @@ export class BallGroup extends Phaser.Physics.Arcade.Group {
             frameQuantity: this.MAX_BALL_COUNT,
             active: false,
             visible: false,
-            setXY: {
-                x : this.scene.scale.width / 2,
-			    y : this.scene.scale.height - 25,
-            },
             key: 'ball'
         });
 

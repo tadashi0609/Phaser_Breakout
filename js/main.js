@@ -13,6 +13,9 @@ class ExampleScene extends Phaser.Scene {
 
 	powerupTimer;
 
+	pointer;
+	isMove;
+
 	scoreText;
 	score = 0;
 
@@ -46,7 +49,7 @@ class ExampleScene extends Phaser.Scene {
 
 		this.paddle = this.add.sprite(
 			this.scale.width * 0.5,
-			this.scale.height - 5,
+			this.scale.height - 70,
 			'paddle'
 		);
 		this.physics.add.existing(this.paddle);
@@ -81,13 +84,30 @@ class ExampleScene extends Phaser.Scene {
 		this.startText.setOrigin(0.5, 0.5);
 
 		this.input.on(
-			'pointerdown',
+			'pointerup',
 			() => {
-				this.startText.visible = false;
-				this.startGame();
+				if (!this.isMove) {
+					this.startText.visible = false;
+					this.startGame();
+				}
 			},
 			this,
 		);
+		this.input.on(
+			'pointerdown',
+			() => { this.isMove = false; },
+			this,
+		)
+		this.input.on(
+			'pointermove',
+			() => { this.isMove = true; },
+			this,
+		)
+
+		// window.addEventListener('pointermove', (event) => {
+		// 	// 画面全体のクライアント座標を取得
+		// 	this.pointer.x = event.clientX / 2;
+		// });
 
 		this.ballGroup = new BallGroup(this);
 		this.brickGroup = new BrickGroup(this);
@@ -125,7 +145,9 @@ class ExampleScene extends Phaser.Scene {
 			);
 		}
 
-		this.paddle.x = this.input.x || this.scale.width / 2;
+		this.pointer = this.input.activePointer;
+
+		this.paddle.x = this.pointer.x || this.scale.width / 2;
 		if (this.paddle.x - this.paddle.body.width / 2 < 0) {
 			this.paddle.x = this.paddle.body.width / 2;
 		} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
@@ -234,22 +256,24 @@ class ExampleScene extends Phaser.Scene {
 			this.lifeLostText.visible = true;
 			this.playing = false;
 
-			this.input.once(
-				'pointerdown',
+			this.input.on(
+				'pointerup',
 				() => {
-					this.lifeLostText.visible = false;
-					this.playing = true;
+					if (!this.isMove) {
+						this.lifeLostText.visible = false;
+						this.playing = true;
 
-					this.powerupTimer.play();
+						this.powerupTimer.play();
 
-					const newVelocity = this.calcBallVelocity();
-					this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+						const newVelocity = this.calcBallVelocity();
+						this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
 
-					this.powerupGroup.children.iterate(powerup => {
-						if (powerup.active) {
-							powerup.startFall()
-						}
-					})
+						this.powerupGroup.children.iterate(powerup => {
+							if (powerup.active) {
+								powerup.startFall()
+							}
+						})
+					}
 				},
 				this,
 			);
@@ -286,11 +310,11 @@ class ExampleScene extends Phaser.Scene {
 const config = {
 	type: Phaser.CANVAS,
 	width: 480,
-	height: 320,
+	height: 400,
 	scene: ExampleScene,
 	scale: {
 		mode: Phaser.Scale.FIT,
-		autoCenter: Phaser.Scale.CENTER_BOTH,
+		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 	},
 	backgroundColor: '#eeeeee',
 	physics: {
