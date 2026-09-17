@@ -147,11 +147,13 @@ class ExampleScene extends Phaser.Scene {
 
 		this.pointer = this.input.activePointer;
 
-		this.paddle.x = this.pointer.x || this.scale.width / 2;
-		if (this.paddle.x - this.paddle.body.width / 2 < 0) {
-			this.paddle.x = this.paddle.body.width / 2;
-		} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
-			this.paddle.x = this.scale.width - this.paddle.body.width / 2;
+		if (this.isMove) {
+			this.paddle.x = this.pointer.x || this.scale.width / 2;
+			if (this.paddle.x - this.paddle.body.width / 2 < 0) {
+				this.paddle.x = this.paddle.body.width / 2;
+			} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
+				this.paddle.x = this.scale.width - this.paddle.body.width / 2;
+			}
 		}
 
 		if (!this.playing) {
