@@ -3,6 +3,8 @@ import {BrickGroup} from './brickGroup.js';
 import {BallGroup} from './ballGroup.js';
 import { Powerup } from './powerup.js';
 
+const MaxLevel = 1;
+
 class ExampleScene extends Phaser.Scene {
 	paddle;
 	brickGroup;
@@ -16,6 +18,8 @@ class ExampleScene extends Phaser.Scene {
 	pointer;
 	isMove;
 
+	level;
+
 	scoreText;
 	score = 0;
 
@@ -27,6 +31,16 @@ class ExampleScene extends Phaser.Scene {
 	startText;
 
 	textStyle = { font: '18px Arial', fill: '#0095dd'};
+
+	init() {
+		if (this.registry.has('level')) {
+			this.level = this.registry.get('level');
+		}
+		else {
+			this.registry.set('level', 0);
+			this.level = 0;
+		}
+	}
 
 	preload() {
 		this.load.image('ball', 'img/ball.png');
@@ -41,7 +55,7 @@ class ExampleScene extends Phaser.Scene {
 			frameHeight: 20,
 		});
 
-		this.load.json('level', 'json/level0.json');
+		this.load.json('level', 'json/level' + this.level + '.json');
 	}
 
 	create() {
@@ -174,14 +188,21 @@ class ExampleScene extends Phaser.Scene {
 
 	initGame(cleared = false) {
 		if (cleared) {
-			this.brickGroup.clear();
-			this.brickGroup.initBricks(this.cache.json.get('level'));
+			this.cache.json.remove('level');
+
+			if (this.registry.get('level') === MaxLevel) {
+				this.registry.set('level', 0);
+			} else {
+				this.registry.values.level++;
+			}
+
+			this.scene.restart();
 		} else if (!this.playing) {
 			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
 			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
-			})
+			});
 		}
 
 		const brickCount = this.brickGroup.countActive();
@@ -280,7 +301,7 @@ class ExampleScene extends Phaser.Scene {
 				this,
 			);
 		} else {
-			this.scene.restart();
+			this.initGame();
 		}
 	}
 
