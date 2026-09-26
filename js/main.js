@@ -14,6 +14,7 @@ class ExampleScene extends Phaser.Scene {
 	firstBall;
 
 	powerupTimer;
+	paddleFlashTween;
 
 	pointer;
 	isMove;
@@ -128,10 +129,30 @@ class ExampleScene extends Phaser.Scene {
 		this.powerupGroup = this.physics.add.group();
 		this.powerupGroup.runChildUpdate = true;
 
-		this.powerupTimer = this.add.timeline({
-			at: 10000,
-			run: () => { this.paddle.scaleX = 1; }
+		this.paddleFlashTween = this.tweens.add({
+			targets: this.paddle,
+			repeat: -1,
+			yoyo: true,
+			alpha: 0,
+			duration: 500,
+			ease: Phaser.Tweens.Builders.GetEaseFunction('cubic.in'),
+			onComplete: () => { this.paddle.alpha = 1; }
 		});
+		this.paddleFlashTween.pause();
+
+		this.powerupTimer = this.add.timeline([
+			{
+			at: 7000,
+			run: () => { this.paddleFlashTween.resume(); }
+		},
+		{
+			at: 10000,
+			run: () => {
+				this.paddle.scaleX = 1;
+				this.paddleFlashTween.complete();
+			}
+		}
+		]);
 
 		this.initGame();
 	}
@@ -219,6 +240,11 @@ class ExampleScene extends Phaser.Scene {
 		this.powerupTimer.reset();
 		this.powerupTimer.stop();
 
+		if (this.paddleFlashTween.isPlaying) {
+			this.paddleFlashTween.complete();
+			this.paddleFlashTween.stop();
+		}
+
 		this.startText.visible = true;
 		this.lives = 3;
 		this.score = 0;
@@ -273,7 +299,8 @@ class ExampleScene extends Phaser.Scene {
 				powerup.body.stop();
 			})
 
-			this.powerupTimer.stop();
+			const isTimerPlayed = this.powerupTimer.isPlaying();
+			this.powerupTimer.pause();
 
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
@@ -286,7 +313,7 @@ class ExampleScene extends Phaser.Scene {
 						this.lifeLostText.visible = false;
 						this.playing = true;
 
-						this.powerupTimer.play();
+						if (isTimerPlayed) { this.powerupTimer.resume(); }
 
 						const newVelocity = this.calcBallVelocity();
 						this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
