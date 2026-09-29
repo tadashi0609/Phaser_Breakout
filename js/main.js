@@ -135,13 +135,22 @@ class ExampleScene extends Phaser.Scene {
 			yoyo: true,
 			alpha: 0,
 			duration: 500,
+			paused: true,
 			ease: Phaser.Tweens.Builders.GetEaseFunction('cubic.in'),
-			onComplete: () => { this.paddle.alpha = 1; }
+			onPause: () => { this.paddle.alpha = 1; }
 		});
-		this.paddleFlashTween.pause();
 
 		this.powerupTimer = this.add.timeline([
-			{
+		{
+			at: 0,
+			run: () => {
+				if (!this.paddleFlashTween.isPaused()) {
+					this.paddleFlashTween.pause();
+					this.paddleFlashTween.seek(0);
+				}
+			}
+		},
+		{
 			at: 7000,
 			run: () => { this.paddleFlashTween.resume(); }
 		},
@@ -149,7 +158,7 @@ class ExampleScene extends Phaser.Scene {
 			at: 10000,
 			run: () => {
 				this.paddle.scaleX = 1;
-				this.paddleFlashTween.complete();
+				this.paddleFlashTween.pause();
 			}
 		}
 		]);
@@ -240,9 +249,8 @@ class ExampleScene extends Phaser.Scene {
 		this.powerupTimer.reset();
 		this.powerupTimer.stop();
 
-		if (this.paddleFlashTween.isPlaying) {
-			this.paddleFlashTween.complete();
-			this.paddleFlashTween.stop();
+		if (!this.paddleFlashTween.isPaused()) {
+			this.paddleFlashTween.pause();
 		}
 
 		this.startText.visible = true;
@@ -280,7 +288,7 @@ class ExampleScene extends Phaser.Scene {
 			
 			case 1:
 				this.paddle.scaleX = 2;
-				this.powerupTimer.play();
+				this.powerupTimer.play(true);
 				break;
 		
 			default:
