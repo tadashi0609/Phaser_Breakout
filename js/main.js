@@ -270,14 +270,18 @@ class ExampleScene extends Phaser.Scene {
 	}
 
 	hitBrick(ball, brick) {
-		brick.disableBody(true, true);
+		const disabled = brick.hitBall();
 
-		if (Math.random() < 0.3 && this.powerupGroup.getFirstDead()) {
-			this.powerupGroup.getFirstDead().startFall(brick.x, brick.y);
+		if (disabled) {
+			if (Math.random() < 0.3 && this.powerupGroup.getFirstDead()) {
+				this.powerupGroup.getFirstDead().startFall(brick.x, brick.y);
+			}
+
+			this.score += 10;
+			this.scoreText.setText('Points: ' + this.score);
+
 		}
 
-		this.score += 10;
-		this.scoreText.setText('Points: ' + this.score);
 	}
 
 	getPowerup(powerup, paddle) {
@@ -366,7 +370,7 @@ class ExampleScene extends Phaser.Scene {
 }
 
 const config = {
-	type: Phaser.CANVAS,
+	type: Phaser.WEBGL,
 	width: 480,
 	height: 400,
 	scene: ExampleScene,

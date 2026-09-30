@@ -19,8 +19,8 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 			width: 50,
 			height: 20,
 			count: {
-				row: 3,
-				col: 7,
+				row: 6,
+				col: 9,
 			},
 			offset: {
 				top: 50,
@@ -30,17 +30,23 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 		};
 
 		for (let r in layoutData.layout) {
-			for (let c in layoutData.layout[r]) {
-				if (layoutData.layout[r][c]){
+			for (let c in layoutData.layout[r].brick) {
+				const hardness = layoutData.layout[r].brick[c];
+				
+				if (hardness !== 0) {
 					const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
 					const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
 
-					const newBrick = this.scene.physics.add.sprite(brickX, brickY, 'brick');
-					this.scene.add.existing(newBrick);
-					this.scene.physics.add.existing(newBrick);
+					const newBrick = new Brick(this.scene, brickX, brickY, hardness);
 					newBrick.body.setImmovable(true);
-					this.add(newBrick);
 
+					if (hardness > 0) {
+						newBrick.setTintFill(layoutData.layout[r].color);					
+					} else if (hardness === -1) {
+						newBrick.setTintFill(0x444444);
+					}
+
+					this.add(newBrick);
 					brickCount++;
 				}
 			}
@@ -52,9 +58,25 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 }
 
 class Brick extends Phaser.Physics.Arcade.Sprite {
-    scene;
+	hardness;
 
-    constructor(scene, x, y) {
+    constructor(scene, x, y, hardness) {
         super(scene, x, y, 'brick');
+
+		this.scene.physics.add.existing(this);
+		this.scene.add.existing(this);
+
+		this.hardness = hardness;
     }
+
+	hitBall() {
+		if (this.hardness > 0) {
+			this.hardness--;
+		}
+		if (this.hardness === 0) {
+			this.disableBody(true, true);
+			return true;
+		}
+		return false;
+	}
 }
