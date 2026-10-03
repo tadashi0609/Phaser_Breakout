@@ -15,18 +15,22 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
     initBricks(layoutData) {
 		let brickCount = 0;
 
+		const brick = this.scene.add.image(0, 0, 'brick');
+		brick.setActive(false);
+		brick.setVisible(false);
+		
 		const bricksLayout = {
-			width: 50,
-			height: 20,
+			width: brick.width,
+			height: brick.height,
 			count: {
 				row: 6,
 				col: 9,
 			},
 			offset: {
-				top: 50,
+				top: 70,
 				left: 60,
 			},
-			padding: 10,
+			padding: 5,
 		};
 
 		for (let r in layoutData.layout) {
@@ -52,6 +56,7 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 			}
 		}
 
+		brick.destroy()
 		return brickCount;
     }
 

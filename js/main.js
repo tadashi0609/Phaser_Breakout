@@ -61,6 +61,7 @@ class ExampleScene extends Phaser.Scene {
 
 	create() {
 		this.physics.world.checkCollision.down = false;
+		this.physics.world.setBounds(0, 20, this.scale.width, this.scale.height - 20);
 
 		this.paddle = this.add.sprite(
 			this.scale.width * 0.5,
@@ -388,3 +389,5 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+console.log(game);
+console.log(document.getElementsByTagName('canvas')[0]);
