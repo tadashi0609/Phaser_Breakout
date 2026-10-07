@@ -34,6 +34,8 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 		};
 
 		for (let r in layoutData.layout) {
+			const lineColor = layoutData.color[layoutData.layout[r].color];
+
 			for (let c in layoutData.layout[r].brick) {
 				const hardness = layoutData.layout[r].brick[c];
 				
@@ -45,9 +47,10 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 					newBrick.body.setImmovable(true);
 
 					if (hardness > 0) {
-						newBrick.setTintFill(layoutData.layout[r].color);					
+						newBrick.setTintFill(lineColor);
 					} else if (hardness === -1) {
-						newBrick.setTintFill(0x444444);
+						newBrick.setTintFill(0x404040);
+						newBrick.setActive(false);
 					}
 
 					this.add(newBrick);

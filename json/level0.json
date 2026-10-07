@@ -3,30 +3,38 @@
         "row": 6,
         "col": 9
     },
+    "color": {
+        "red": 	    "0xc80000",
+        "green": 	"0x00b000",
+        "blue": 	"0x0000d0",
+        "yellow":   "0xd6bc00",
+        "cyan": 	"0x00b5d6",
+        "purple":   "0xbb00bb"
+    },
     "layout": [
         {
-            "color": "0xbb0000",
+            "color": "red",
             "brick": [ 1,  1,  1,  1,  0,  1,  1,  1,  1]
         },
         {
-            "color": "0x00bb00",
-            "brick": [ 1,  1,  1,  1,  1,  1,  1,  1,  1]
-        },
-        {
-            "color": "0x0000bb",
+            "color": "green",
             "brick": [ 1,  1,  1,  1,  0,  1,  1,  1,  1]
         },
         {
-            "color": "0xbb0000",
-            "brick": [ 1,  1,  1,  1,  1,  1,  1,  1,  1]
+            "color": "blue",
+            "brick": [ 1,  1,  1,  1, -1,  1,  1,  1,  1]
         },
         {
-            "color": "0x00bb00",
+            "color": "yellow",
+            "brick": [ 1,  1,  1,  1, -1,  1,  1,  1,  1]
+        },
+        {
+            "color": "cyan",
             "brick": [ 1,  1,  1,  1,  0,  1,  1,  1,  1]
         },
         {
-            "color": "0x0000bb",
-            "brick": [ 1,  1,  1,  1,  1,  1,  1,  1,  1]
+            "color": "purple",
+            "brick": [ 1,  1,  1,  1,  0,  1,  1,  1,  1]
         }
     ]
     

@@ -84,7 +84,7 @@ class ExampleScene extends Phaser.Scene {
 
 		this.lifeLostText = this.add.text(
 			this.scale.width / 2,
-			this.scale.height / 2,
+			this.scale.height * 0.6,
 			'Life lost, click to continue',
 			this.textStyle,
 		);
@@ -93,7 +93,7 @@ class ExampleScene extends Phaser.Scene {
 
 		this.startText = this.add.text(
 			this.scale.width / 2,
-			this.scale.height / 2,
+			this.scale.height * 0.6,
 			'Click to Start',
 			this.textStyle,
 		);
@@ -379,7 +379,7 @@ const config = {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 	},
-	backgroundColor: '#eeeeee',
+	backgroundColor: '#d0d0d0',
 	physics: {
 		default: 'arcade',
 		arcade: {
