@@ -105,6 +105,8 @@ class ExampleScene extends Phaser.Scene {
 				if (!this.isMove) {
 					this.startText.visible = false;
 					this.startGame();
+				} else {
+					this.isMove = false;
 				}
 			},
 			this,
@@ -120,10 +122,10 @@ class ExampleScene extends Phaser.Scene {
 			this,
 		)
 
-		// window.addEventListener('pointermove', (event) => {
-		// 	// 画面全体のクライアント座標を取得
-		// 	this.pointer.x = event.clientX / 2;
-		// });
+		document.addEventListener('pointermove', (event) => {
+			const canvas = document.getElementsByTagName('canvas')[0];
+			this.pointer.x = (event.clientX - parseInt(canvas.style.marginLeft)) / parseInt(canvas.style.width) * config.width;
+		});
 
 		this.ballGroup = new BallGroup(this);
 		this.brickGroup = new BrickGroup(this);
