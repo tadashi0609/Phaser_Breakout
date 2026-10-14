@@ -5,6 +5,11 @@ import { Powerup } from './powerup.js';
 
 const MaxLevel = 1;
 
+const inputTypes = {
+	'pointer': 0,
+	'keyboard': 1,
+};
+
 class ExampleScene extends Phaser.Scene {
 	paddle;
 	brickGroup;
@@ -18,6 +23,10 @@ class ExampleScene extends Phaser.Scene {
 
 	pointer;
 	isMove;
+
+	cursorKeys;
+
+	inputType;
 
 	level;
 
@@ -113,19 +122,35 @@ class ExampleScene extends Phaser.Scene {
 		);
 		this.input.on(
 			'pointerdown',
-			() => { this.isMove = false; },
+			() => {
+				this.isMove = false;
+				this.inputType = inputTypes.pointer;
+			},
 			this,
 		)
 		this.input.on(
 			'pointermove',
-			() => { this.isMove = true; },
+			() => {
+				this.isMove = true;
+				this.inputType = inputTypes.pointer;
+			},
 			this,
 		)
 
+		this.input.keyboard.on(
+			'keydown',
+			(event) => {
+				this.inputType = inputTypes.keyboard;
+			}
+		)
+
 		document.addEventListener('pointermove', (event) => {
+			this.inputType = inputTypes.pointer;
 			const canvas = document.getElementsByTagName('canvas')[0];
 			this.pointer.x = (event.clientX - parseInt(canvas.style.marginLeft)) / parseInt(canvas.style.width) * config.width;
 		});
+
+		this.cursorKeys = this.input.keyboard.createCursorKeys();
 
 		this.ballGroup = new BallGroup(this);
 		this.brickGroup = new BrickGroup(this);
@@ -194,13 +219,35 @@ class ExampleScene extends Phaser.Scene {
 
 		this.pointer = this.input.activePointer;
 
-		if (this.isMove) {
-			this.paddle.x = this.pointer.x || this.scale.width / 2;
-			if (this.paddle.x - this.paddle.body.width / 2 < 0) {
-				this.paddle.x = this.paddle.body.width / 2;
-			} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
-				this.paddle.x = this.scale.width - this.paddle.body.width / 2;
-			}
+		switch (this.inputType) {
+			case inputTypes.pointer:
+				if (this.isMove) {
+					this.paddle.x = this.pointer.x;
+				}
+				
+				break;
+
+			case inputTypes.keyboard:
+				if (this.cursorKeys.left.isDown) {
+					this.paddle.x -= 10;
+				}
+				if (this.cursorKeys.right.isDown) {
+					this.paddle.x += 10;
+				}
+				if (this.cursorKeys.space.isDown && !this.isPlaying) {
+					this.startGame();
+				}
+
+				break;
+		
+			default:
+				break;
+		}
+
+		if (this.paddle.x - this.paddle.body.width / 2 < 0) {
+			this.paddle.x = this.paddle.body.width / 2;
+		} else if (this.paddle.x + this.paddle.body.width / 2 > this.scale.width) {
+			this.paddle.x = this.scale.width - this.paddle.body.width / 2;
 		}
 
 		if (!this.playing) {
