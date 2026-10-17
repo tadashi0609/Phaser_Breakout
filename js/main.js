@@ -1,13 +1,12 @@
-import {Ball} from './ball.js';
-import {BrickGroup} from './brickGroup.js';
-import {BallGroup} from './ballGroup.js';
+import { BrickGroup } from './brickGroup.js';
+import { BallGroup } from './ballGroup.js';
 import { Powerup } from './powerup.js';
 
-const MaxLevel = 1;
+const MAX_LEVEL = 1;
 
-const inputTypes = {
-	'pointer': 0,
-	'keyboard': 1,
+const INPUT_TYPES = {
+	pointer: 0,
+	keyboard: 1,
 };
 
 class ExampleScene extends Phaser.Scene {
@@ -18,11 +17,11 @@ class ExampleScene extends Phaser.Scene {
 
 	firstBall;
 
-	powerupTimer;
+	powerupTimeline;
 	paddleFlashTween;
 
 	pointer;
-	isMove;
+	isPointerMove;
 
 	cursorKeys;
 
@@ -45,8 +44,7 @@ class ExampleScene extends Phaser.Scene {
 	init() {
 		if (this.registry.has('level')) {
 			this.level = this.registry.get('level');
-		}
-		else {
+		} else {
 			this.registry.set('level', 0);
 			this.level = 0;
 		}
@@ -56,10 +54,6 @@ class ExampleScene extends Phaser.Scene {
 		this.load.image('ball', 'img/ball.png');
 		this.load.image('paddle', 'img/paddle.png');
 		this.load.image('brick', 'img/brick.png');
-		this.load.spritesheet('button', 'img/button.png', {
-			frameWidth: 120,
-			frameHeight: 40,
-		});
 		this.load.spritesheet('powerup', 'img/powerup.png', {
 			frameWidth: 20,
 			frameHeight: 20,
@@ -111,11 +105,10 @@ class ExampleScene extends Phaser.Scene {
 		this.input.on(
 			'pointerup',
 			() => {
-				if (!this.isMove) {
-					this.startText.visible = false;
+				if (!this.isPointerMove) {
 					this.startGame();
 				} else {
-					this.isMove = false;
+					this.isPointerMove = false;
 				}
 			},
 			this,
@@ -123,16 +116,16 @@ class ExampleScene extends Phaser.Scene {
 		this.input.on(
 			'pointerdown',
 			() => {
-				this.isMove = false;
-				this.inputType = inputTypes.pointer;
+				this.isPointerMove = false;
+				this.inputType = INPUT_TYPES.pointer;
 			},
 			this,
 		)
 		this.input.on(
 			'pointermove',
 			() => {
-				this.isMove = true;
-				this.inputType = inputTypes.pointer;
+				this.isPointerMove = true;
+				this.inputType = INPUT_TYPES.pointer;
 			},
 			this,
 		)
@@ -140,14 +133,14 @@ class ExampleScene extends Phaser.Scene {
 		this.input.keyboard.on(
 			'keydown',
 			(event) => {
-				this.inputType = inputTypes.keyboard;
+				this.inputType = INPUT_TYPES.keyboard;
 			}
 		)
 
 		document.addEventListener('pointermove', (event) => {
-			this.inputType = inputTypes.pointer;
+			this.inputType = INPUT_TYPES.pointer;
 			const canvas = document.getElementsByTagName('canvas')[0];
-			this.pointer.x = (event.clientX - parseInt(canvas.style.marginLeft)) / parseInt(canvas.style.width) * config.width;
+			this.pointer.x = (event.clientX - parseInt(canvas.style.marginLeft)) / parseInt(canvas.style.width) * this.scale.width;
 		});
 
 		this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -168,7 +161,7 @@ class ExampleScene extends Phaser.Scene {
 			onPause: () => { this.paddle.alpha = 1; }
 		});
 
-		this.powerupTimer = this.add.timeline([
+		this.powerupTimeline = this.add.timeline([
 		{
 			at: 0,
 			run: () => {
@@ -220,19 +213,19 @@ class ExampleScene extends Phaser.Scene {
 		this.pointer = this.input.activePointer;
 
 		switch (this.inputType) {
-			case inputTypes.pointer:
-				if (this.isMove) {
+			case INPUT_TYPES.pointer:
+				if (this.isPointerMove) {
 					this.paddle.x = this.pointer.x;
 				}
 				
 				break;
 
-			case inputTypes.keyboard:
+			case INPUT_TYPES.keyboard:
 				if (this.cursorKeys.left.isDown) {
-					this.paddle.x -= 10;
+					this.paddle.x -= 8;
 				}
 				if (this.cursorKeys.right.isDown) {
-					this.paddle.x += 10;
+					this.paddle.x += 8;
 				}
 				if (this.cursorKeys.space.isDown && !this.isPlaying) {
 					this.startGame();
@@ -255,7 +248,6 @@ class ExampleScene extends Phaser.Scene {
 			this.firstBall.y = this.paddle.y - this.paddle.height - this.firstBall.height / 2;
 		}
 
-		// アクティブなブロックがない = ステージクリア
 		if (this.brickGroup.countActive() === 0) {
 			this.initGame(true);
 		}
@@ -270,7 +262,7 @@ class ExampleScene extends Phaser.Scene {
 		if (cleared) {
 			this.cache.json.remove('level');
 
-			if (this.registry.get('level') === MaxLevel) {
+			if (this.registry.get('level') === MAX_LEVEL) {
 				this.registry.set('level', 0);
 			} else {
 				this.registry.values.level++;
@@ -296,8 +288,8 @@ class ExampleScene extends Phaser.Scene {
 		}
 
 		this.paddle.scaleX = 1;
-		this.powerupTimer.reset();
-		this.powerupTimer.stop();
+		this.powerupTimeline.reset();
+		this.powerupTimeline.stop();
 
 		if (!this.paddleFlashTween.isPaused()) {
 			this.paddleFlashTween.pause();
@@ -335,14 +327,14 @@ class ExampleScene extends Phaser.Scene {
 	}
 
 	getPowerup(powerup, paddle) {
-		switch (powerup.type) {
+		switch (powerup.powerupType) {
 			case 0:
 				this.ballGroup.increaseBall();
 				break;
 			
 			case 1:
 				this.paddle.scaleX = 2;
-				this.powerupTimer.play(true);
+				this.powerupTimeline.play(true);
 				break;
 		
 			default:
@@ -361,8 +353,8 @@ class ExampleScene extends Phaser.Scene {
 				powerup.body.stop();
 			})
 
-			const isTimerPlayed = this.powerupTimer.isPlaying();
-			this.powerupTimer.pause();
+			const isTimerPlayed = this.powerupTimeline.isPlaying();
+			this.powerupTimeline.pause();
 
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
@@ -371,11 +363,11 @@ class ExampleScene extends Phaser.Scene {
 			this.input.on(
 				'pointerup',
 				() => {
-					if (!this.isMove) {
+					if (!this.isPointerMove) {
 						this.lifeLostText.visible = false;
 						this.playing = true;
 
-						if (isTimerPlayed) { this.powerupTimer.resume(); }
+						if (isTimerPlayed) { this.powerupTimeline.resume(); }
 
 						const newVelocity = this.calcBallVelocity();
 						this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
@@ -438,5 +430,3 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-console.log(game);
-console.log(document.getElementsByTagName('canvas')[0]);

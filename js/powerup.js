@@ -1,11 +1,11 @@
 export class Powerup extends Phaser.Physics.Arcade.Sprite {
-	type = 0;
+	powerupType = 0;
 	parentGroup;
 
 	constructor(scene, x, y, frame, group) {
 		super(scene, x, y, 'powerup', frame);
 		
-		this.type = frame;
+		this.powerupType = frame;
 		this.parentGroup = group;
 
 		this.scene.physics.add.existing(this);

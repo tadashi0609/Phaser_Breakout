@@ -1,8 +1,6 @@
 export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
-
     constructor(scene) {
         super(scene.physics.world, scene);
-        // this.scene.events.on('update', this.update, this);
 
         this.scene.add.existing(this);
 		this.scene.physics.add.existing(this);
@@ -15,11 +13,9 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
     initBricks(layoutData) {
 		let brickCount = 0;
 
-		const brick = this.scene.add.image(0, 0, 'brick');
-		brick.setActive(false);
-		brick.setVisible(false);
+		const brick = this.scene.add.image(100, 0, 'brick');
 		
-		const bricksLayout = {
+		const BRICKS_LAYOUT = {
 			width: brick.width,
 			height: brick.height,
 			count: {
@@ -40,8 +36,8 @@ export class BrickGroup extends Phaser.Physics.Arcade.StaticGroup {
 				const hardness = layoutData.layout[r].brick[c];
 				
 				if (hardness !== 0) {
-					const brickX = c * (bricksLayout.width + bricksLayout.padding) + bricksLayout.offset.left;
-					const brickY = r * (bricksLayout.height + bricksLayout.padding) + bricksLayout.offset.top;
+					const brickX = c * (BRICKS_LAYOUT.width + BRICKS_LAYOUT.padding) + BRICKS_LAYOUT.offset.left;
+					const brickY = r * (BRICKS_LAYOUT.height + BRICKS_LAYOUT.padding) + BRICKS_LAYOUT.offset.top;
 
 					const newBrick = new Brick(this.scene, brickX, brickY, hardness);
 					newBrick.body.setImmovable(true);

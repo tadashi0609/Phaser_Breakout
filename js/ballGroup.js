@@ -1,8 +1,7 @@
 import {Ball} from './ball.js';
+const MAX_BALL_COUNT = 256;
 
 export class BallGroup extends Phaser.Physics.Arcade.Group {
-    MAX_BALL_COUNT = 256;
-
     constructor(scene) {
         super(scene.physics.world, scene, {
             collideWorldBounds: true,
@@ -16,7 +15,7 @@ export class BallGroup extends Phaser.Physics.Arcade.Group {
 
         this.createMultiple({
             classType: Ball,
-            frameQuantity: this.MAX_BALL_COUNT,
+            frameQuantity: MAX_BALL_COUNT,
             active: false,
             visible: false,
             key: 'ball'
@@ -41,7 +40,7 @@ export class BallGroup extends Phaser.Physics.Arcade.Group {
     }
 
     increaseBall() {
-        if (this.getMatching('active', true).length * 3 < this.MAX_BALL_COUNT) {
+        if (this.getMatching('active', true).length * 3 < MAX_BALL_COUNT) {
             for (const ball of this.getMatching('active', true)) {
                 for (let i = 0; i < 2; i++) {
                     let newBall = this.getFirstDead(false, ball.x, ball.y);
