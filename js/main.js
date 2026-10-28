@@ -169,6 +169,8 @@ class MainScene extends Phaser.Scene {
 			this.brickGroup.children.iterate(brick => {
 				brick.enableBody(false, 0, 0, true, true);
 			});
+
+			this.score = this.registry.get('score');
 		}
 
 		const brickCount = this.brickGroup.countActive();
@@ -239,34 +241,13 @@ class MainScene extends Phaser.Scene {
 				powerup.body.stop();
 			})
 
-			const isTimerPlayed = this.paddle.powerupTimeline.isPlaying();
+			this.paddle.isTimelinePlayed = this.paddle.powerupTimeline.isPlaying();
 			this.paddle.powerupTimeline.pause();
 
 			this.livesText.setText('Lives: ' + this.lives);
 			this.lifeLostText.visible = true;
 			this.playing = false;
 
-			this.input.on(
-				'pointerup',
-				() => {
-					if (!this.isPointerMove) {
-						this.lifeLostText.visible = false;
-						this.playing = true;
-
-						if (isTimerPlayed) { this.paddle.powerupTimeline.resume(); }
-
-						const newVelocity = this.calcBallVelocity();
-						this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
-
-						this.powerupGroup.children.iterate(powerup => {
-							if (powerup.active) {
-								powerup.startFall()
-							}
-						})
-					}
-				},
-				this,
-			);
 		} else {
 			this.initGame();
 		}
@@ -275,10 +256,22 @@ class MainScene extends Phaser.Scene {
 	startGame() {
 		if (!this.playing) {
 			this.startText.visible = false;
+			this.lifeLostText.visible = false;
 			this.playing = true;
 
 			const newVelocity = this.calcBallVelocity();
 			this.firstBall.body.velocity.set(newVelocity.x, newVelocity.y);
+
+			this.powerupGroup.children.iterate(powerup => {
+				if (powerup.active) {
+					powerup.startFall()
+				}
+			});
+
+			if (this.paddle.isTimelinePlayed) {
+				this.paddle.powerupTimeline.resume();
+				this.paddle.isTimelinePlayed = false;
+			}
 		}
 	}
 

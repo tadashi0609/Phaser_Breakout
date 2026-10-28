@@ -2,6 +2,8 @@ export class Paddle extends Phaser.Physics.Arcade.Sprite {
     powerupTimeline;
     flashTween;
 
+	isTimelinePlayed = false;
+
     constructor(scene, x, y) {
         super(scene, x, y, 'paddle');
 
