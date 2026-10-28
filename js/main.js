@@ -41,6 +41,13 @@ class MainScene extends Phaser.Scene {
 			this.registry.set('level', 0);
 			this.level = 0;
 		}
+
+		if (this.registry.has('score')) {
+			this.score = this.registry.get('score');
+		} else {
+			this.registry.set('score', 0);
+			this.score = 0;
+		}
 	}
 
 	preload() {
@@ -61,7 +68,10 @@ class MainScene extends Phaser.Scene {
 
 		this.paddle = new Paddle(this, this.scale.width / 2, this.scale.height - 70);
 
-		this.scoreText = this.add.text(5, 5, 'Points: 0', this.textStyle);
+		this.scoreText = this.add.text(
+			5, 5,
+			'Points: ' + this.score,
+			this.textStyle);
 
 		this.livesText = this.add.text(
 			this.scale.width - 5,
@@ -146,8 +156,10 @@ class MainScene extends Phaser.Scene {
 
 			if (this.registry.get('level') === MAX_LEVEL) {
 				this.registry.set('level', 0);
+				this.registry.set('score', 0);
 			} else {
 				this.registry.values.level++;
+				this.registry.set('score', this.score);
 			}
 
 			this.scene.restart();
@@ -173,7 +185,6 @@ class MainScene extends Phaser.Scene {
 
 		this.startText.visible = true;
 		this.lives = 3;
-		this.score = 0;
 		this.playing = false;
 		this.paddle.x = this.scale.width / 2;
 
