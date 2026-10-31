@@ -176,7 +176,7 @@ class MainScene extends Phaser.Scene {
 		const brickCount = this.brickGroup.countActive();
 
 		this.powerupGroup.clear(true, true);
-		for (let i = 0; i < brickCount * 0.25; i++) {
+		for (let i = 0; i < brickCount / 4; i++) {
 			let type = (((-1) ** i) + 1) / 2;
 			if (i > brickCount * 0.1) { type = 0; }
 			const powerup = new Powerup(this, 0, 0, type, this.powerupGroup);
@@ -204,15 +204,16 @@ class MainScene extends Phaser.Scene {
 		const disabled = brick.hitBall();
 
 		if (disabled) {
-			if (Math.random() < 0.3 && this.powerupGroup.getFirstDead()) {
-				this.powerupGroup.getFirstDead().startFall(brick.x, brick.y);
+			const rand = Math.trunc(Math.random() * 2);
+			if (this.powerupGroup.countActive(false) + rand > this.brickGroup.countActive() / 4) {
+				if (this.powerupGroup.getFirstDead()) {
+					this.powerupGroup.getFirstDead().startFall(brick.x, brick.y);
+				}
 			}
 
 			this.score += 10;
 			this.scoreText.setText('Points: ' + this.score);
-
 		}
-
 	}
 
 	getPowerup(powerup, paddle) {
