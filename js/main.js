@@ -16,6 +16,8 @@ class MainScene extends Phaser.Scene {
 
 	inputScene;
 
+	clearTimer;
+
 	level;
 
 	scoreText;
@@ -29,6 +31,7 @@ class MainScene extends Phaser.Scene {
 	startText;
 
 	textStyle = { font: '18px Arial', fill: '#0095dd'};
+	timerConfig = { delay: 30000, paused: true };
 
 	constructor() {
 		super({ key: 'main' });
@@ -105,6 +108,8 @@ class MainScene extends Phaser.Scene {
 
 		this.scene.launch('input');
 		this.inputScene = this.scene.get('input');
+
+		this.clearTimer = this.time.addEvent(this.timerConfig);
 		
 		this.initGame();
 	}
@@ -159,6 +164,8 @@ class MainScene extends Phaser.Scene {
 				this.registry.set('score', 0);
 			} else {
 				this.registry.values.level++;
+
+				this.score += Math.trunc(this.clearTimer.getRemainingSeconds()) * 50;
 				this.registry.set('score', this.score);
 			}
 
@@ -184,6 +191,8 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.paddle.initScale();
+
+		this.clearTimer.reset(this.timerConfig);
 
 		this.startText.visible = true;
 		this.lives = 3;
@@ -249,6 +258,7 @@ class MainScene extends Phaser.Scene {
 			this.lifeLostText.visible = true;
 			this.playing = false;
 
+			this.clearTimer.paused = true;
 		} else {
 			this.initGame();
 		}
@@ -273,6 +283,8 @@ class MainScene extends Phaser.Scene {
 				this.paddle.powerupTimeline.resume();
 				this.paddle.isTimelinePlayed = false;
 			}
+
+			this.clearTimer.paused = false;
 		}
 	}
 
