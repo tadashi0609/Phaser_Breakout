@@ -1,0 +1,44 @@
+<style>
+    .result {
+        background-color: #f0f0f0;
+        border: 1px solid #000;
+        border-radius: 6px;
+        height: 180px;
+        width: 240px;
+		margin-top: 0;
+		margin-bottom: 0;
+    }
+    h3 {
+        background-color: sandybrown;
+		border-radius: 6px 6px 0 0;
+		padding: 6px;
+		margin-top: 0;
+		margin-bottom: 0;
+    }
+    input[type="text"] {
+        border: 1px solid #000;
+        border-radius: 4px;
+        box-shadow: 0 1px #fff;
+		box-sizing: border-box;
+		height: 30px;
+		margin: 14px 0 0 20px;
+		padding-left: 25px;
+		transition: box-shadow 0.3s;
+		width: 200px;
+    }
+	input[type="button"] {
+		width: 120px;
+		height: 27px;
+		display: block;
+		margin: 14px 0 0 30px;
+		border: 1px solid #000;
+		border-radius: 4px;
+	}
+</style>
+
+<div class="result">
+    <h3 id="scoreText">Score: </h3>
+    <input type="text" name="nameField" placeholder="名前を入力"><br />
+    <input type="button" name="submitButton" value="スコアを記録">
+    <input type="button" name="cancelButton" value="記録しない"><br />
+</div>

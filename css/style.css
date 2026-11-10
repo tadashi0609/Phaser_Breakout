@@ -1,0 +1,46 @@
+@charset "utf-8";
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+/* ヘッダー */
+header {
+    height: 60px;
+    background-color: sandybrown;
+}
+header .header__wrap {
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+header .title  {
+    margin-left: auto;
+}
+header .nav__list {
+    display: flex;
+    margin-left: auto;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+}
+header .nav__list li {
+    margin-left: 24px;
+    list-style: none;
+}
+header .nav__list li a {
+    display: block;
+    font-size: 20px;
+}
+div .header__wrap {
+    height: 10vh;
+}
+
+
+canvas {
+    height: 85vh;
+    max-width: 90vw;
+    max-height: 90vh;
+}

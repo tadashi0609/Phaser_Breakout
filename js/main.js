@@ -63,6 +63,7 @@ class MainScene extends Phaser.Scene {
 		});
 
 		this.load.json('level', 'json/level' + this.level + '.json');
+		this.load.html('result', 'result.html');
 	}
 
 	create() {
@@ -159,7 +160,26 @@ class MainScene extends Phaser.Scene {
 		if (cleared) {
 			this.cache.json.remove('level');
 
-			if (this.registry.get('level') === MAX_LEVEL) {
+			if (this.level === MAX_LEVEL) {
+				const element = this.add.dom(this.scale.width / 2, this.scale.height / 2).createFromCache('result');
+				element.getChildByID('scoreText').innerText = 'Score: ' + this.score;
+				element.addListener('click');
+				const scene = this.scene;
+				element.on('click', function (event) {
+					if (event.target.name === 'submitButton') {
+						const inputText = this.getChildByName('nameField').value;
+						
+						if (inputText !== '') {
+							this.destroy(true);
+							scene.restart();
+						}
+					} else if (event.target.name === 'cancelButton') {
+						this.destroy(true);
+						scene.restart();
+					}
+				})
+
+				this.scene.pause('main');
 				this.registry.set('level', 0);
 				this.registry.set('score', 0);
 			} else {
@@ -167,9 +187,8 @@ class MainScene extends Phaser.Scene {
 
 				this.score += Math.trunc(this.clearTimer.getRemainingSeconds()) * 50;
 				this.registry.set('score', this.score);
+				this.scene.restart();
 			}
-
-			this.scene.restart();
 		} else if (!this.playing) {
 			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
@@ -318,7 +337,11 @@ const config = {
 		arcade: {
 			debug: false,
 		}
-	}
+	},
+	parent: 'game__wrap',
+	dom: {
+		createContainer: true,
+	},
 };
 
 const game = new Phaser.Game(config);
