@@ -147,7 +147,7 @@ class MainScene extends Phaser.Scene {
 		}
 
 		if (this.brickGroup.countActive() === 0) {
-			this.initGame(true);
+			this.loadNextLevel();
 		}
 
 		if (this.ballGroup.countActive() === 0) {
@@ -156,58 +156,8 @@ class MainScene extends Phaser.Scene {
 
 	}
 
-	initGame(cleared = false) {
-		if (cleared) {
-			this.cache.json.remove('level');
-
-			if (this.level === MAX_LEVEL) {
-				const element = this.add.dom(this.scale.width / 2, this.scale.height / 2).createFromCache('result');
-				const score = this.score;
-				const scene = this.scene;
-				const date = Date.now();
-				element.getChildByID('scoreText').innerText = 'Score: ' + score;
-				element.addListener('click');
-				element.on('click', function (event) {
-					if (event.target.name === 'submitButton') {
-						const inputText = this.getChildByName('nameField').value;
-						let scores;
-
-						if (inputText !== '') {
-							if (localStorage.getItem('scores')) {
-								scores = JSON.parse(localStorage.getItem('scores'));
-								const newScore = { rank: 0, score: score, name: inputText, date: date };
-								scores.push(newScore);
-							} else {
-								scores = [{ rank: 0, score: score, name: inputText, date: date }];
-							}
-
-							scores.sort((a, b) => b.score - a.score);
-							for (let i = 0; i < scores.length; i++) {
-								scores[i].rank = i + 1;
-							}
-
-							localStorage.setItem('scores', JSON.stringify(scores));
-							displayLeaderboard();
-							this.destroy(true);
-							scene.restart();
-						}
-					} else if (event.target.name === 'cancelButton') {
-						this.destroy(true);
-						scene.restart();
-					}
-				})
-
-				this.scene.pause('main');
-				this.registry.set('level', 0);
-				this.registry.set('score', 0);
-			} else {
-				this.registry.values.level++;
-
-				this.score += Math.trunc(this.clearTimer.getRemainingSeconds()) * 50;
-				this.registry.set('score', this.score);
-				this.scene.restart();
-			}
-		} else if (!this.playing) {
+	initGame() {
+		if (!this.playing) {
 			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
 			this.brickGroup.children.iterate(brick => {
@@ -242,6 +192,59 @@ class MainScene extends Phaser.Scene {
 
 		this.scoreText.setText('Points: ' + this.score);
 		this.livesText.setText('Lives: ' + this.lives);
+	}
+
+	loadNextLevel() {
+		this.playing = false;
+		this.cache.json.remove('level');
+
+		if (this.level === MAX_LEVEL) {
+			const element = this.add.dom(this.scale.width / 2, this.scale.height / 2).createFromCache('result');
+			const score = this.score;
+			const scene = this.scene;
+			const date = Date.now();
+			element.getChildByID('scoreText').innerText = 'Score: ' + score;
+			element.addListener('click');
+			element.on('click', function (event) {
+				if (event.target.name === 'submitButton') {
+					const inputText = this.getChildByName('nameField').value;
+					let scores;
+
+					if (inputText !== '') {
+						if (localStorage.getItem('scores')) {
+							scores = JSON.parse(localStorage.getItem('scores'));
+							const newScore = { rank: 0, score: score, name: inputText, date: date };
+							scores.push(newScore);
+						} else {
+							scores = [{ rank: 0, score: score, name: inputText, date: date }];
+						}
+
+						scores.sort((a, b) => b.score - a.score);
+						for (let i = 0; i < scores.length; i++) {
+							scores[i].rank = i + 1;
+						}
+
+						localStorage.setItem('scores', JSON.stringify(scores));
+						displayLeaderboard();
+						this.destroy(true);
+						scene.restart();
+					}
+				} else if (event.target.name === 'cancelButton') {
+					this.destroy(true);
+					scene.restart();
+				}
+			});
+
+			this.scene.pause('main');
+			this.registry.set('level', 0);
+			this.registry.set('score', 0);
+		} else {
+			this.registry.values.level++;
+
+			this.score += Math.trunc(this.clearTimer.getRemainingSeconds()) * 50;
+			this.registry.set('score', this.score);
+			this.scene.restart();
+		}
 	}
 
 	hitPaddle(ball, paddle) {
