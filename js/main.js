@@ -211,7 +211,9 @@ class MainScene extends Phaser.Scene {
 			this.brickGroup.initBricks(this.cache.json.get('level'));
 		} else {
 			this.brickGroup.children.iterate(brick => {
-				brick.enableBody(false, 0, 0, true, true);
+				if (brick.hardness >= 0) {
+					brick.enableBody(false, 0, 0, true, true);
+				}
 			});
 
 			this.score = this.registry.get('score');
