@@ -5,6 +5,10 @@
     margin: 0;
 }
 
+main {
+    margin-top: 2em;
+}
+
 /* ヘッダー */
 header {
     height: 60px;
@@ -40,7 +44,67 @@ div .header__wrap {
 
 
 canvas {
-    height: 85vh;
+    height: 70vh;
     max-width: 90vw;
-    max-height: 90vh;
+    max-height: 70vh;
+}
+
+
+/* リーダーボード */
+.leaderboard {
+    display: block;
+    border: 1px solid #000;
+    border-radius: 4px;
+    width: 50%;
+    margin: 10px auto;
+}
+.leaderboard_title {
+    margin: 10px auto;
+    padding-left: 1em;
+}
+.leaderboard_sortableTable {
+    table-layout: fixed;
+    width: 80%;
+    overflow-y: auto;
+    border-collapse: collapse;
+    margin: 10px auto;
+	border-right: 1px solid lightgray;
+	border-left: 1px solid lightgray;
+}
+.leaderboard_sortableTable_head {
+    background-color: bisque;
+    border: 1px solid bisque;
+}
+.leaderboard_sortableTable tr :nth-child(1) {
+	text-align: center;
+	width: 15%;
+}
+.leaderboard_sortableTable tr :nth-child(2) {
+	text-align: left;
+    width: 35%;
+}
+.leaderboard_sortableTable tr :nth-child(3) {
+	text-align: right;
+    width: 15%;
+}
+.leaderboard_sortableTable tr :nth-child(4) {
+    text-align: left;
+    width: 35%;
+}
+.leaderboard_sortableTable th,
+.leaderboard_sortableTable td {
+    padding: 0.5em;
+}
+.leaderboard_sortableTable_head th.sort-asc::after{
+    content: '▲'
+}
+.leaderboard_sortableTable_head th.sort-desc::after{
+    content: '▼'
+}
+.leaderboard_sortableTable_head-sortable {
+	cursor: pointer;
+}
+.leaderboard_sortableTable td {
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
 }

@@ -162,14 +162,32 @@ class MainScene extends Phaser.Scene {
 
 			if (this.level === MAX_LEVEL) {
 				const element = this.add.dom(this.scale.width / 2, this.scale.height / 2).createFromCache('result');
-				element.getChildByID('scoreText').innerText = 'Score: ' + this.score;
-				element.addListener('click');
+				const score = this.score;
 				const scene = this.scene;
+				const date = Date.now();
+				element.getChildByID('scoreText').innerText = 'Score: ' + score;
+				element.addListener('click');
 				element.on('click', function (event) {
 					if (event.target.name === 'submitButton') {
 						const inputText = this.getChildByName('nameField').value;
-						
+						let scores;
+
 						if (inputText !== '') {
+							if (localStorage.getItem('scores')) {
+								scores = JSON.parse(localStorage.getItem('scores'));
+								const newScore = { rank: 0, score: score, name: inputText, date: date };
+								scores.push(newScore);
+							} else {
+								scores = [{ rank: 0, score: score, name: inputText, date: date }];
+							}
+
+							scores.sort((a, b) => b.score - a.score);
+							for (let i = 0; i < scores.length; i++) {
+								scores[i].rank = i + 1;
+							}
+
+							localStorage.setItem('scores', JSON.stringify(scores));
+							displayLeaderboard();
 							this.destroy(true);
 							scene.restart();
 						}
@@ -322,6 +340,72 @@ class MainScene extends Phaser.Scene {
 	}
 }
 
+function displayLeaderboard(key = 'score', isDesc = true) {
+	let exports = '';
+	let scores = JSON.parse(localStorage.getItem('scores'));
+
+	if (scores) {		
+		switch (key) {
+			case 'score':
+				scores.sort((a, b) => isDesc ? b.score - a.score : a.score - b.score);
+				break;
+		
+			case 'date':
+				scores.sort((a, b) => isDesc ? b.date - a.date : a.date - b.date);
+				break;
+
+			default:
+				break;
+		}
+
+		scores.forEach(values => {
+			exports += `<tr scope="row"><td>${values.rank}</td><td>${values.name}</td><td>${values.score}</td><td>`
+			const date = new Date(values.date);
+			exports += `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}</td></tr>`;
+		});
+		document.getElementById('leaderboard_sortableTable_body').innerHTML = exports;
+	}
+}
+
+window.addEventListener('load', function () {
+	displayLeaderboard();
+
+	document.querySelectorAll('.leaderboard_sortableTable_head-sortable').forEach(elm => {
+		elm.onclick = function () {
+			const columnNum = this.cellIndex;
+			const thead = document.querySelectorAll('.leaderboard_sortableTable_head th')[columnNum];
+
+			if (columnNum === 3) {
+				// 日付ソート
+				if (thead.classList.contains('sort-desc')) {
+					removeSortMarker();
+					thead.classList.add('sort-asc');
+					displayLeaderboard('date', false);
+				} else {
+					removeSortMarker();
+					thead.classList.add('sort-desc');
+					displayLeaderboard('date', true);
+				}
+
+			} else if (columnNum === 0 || columnNum === 2) {
+				// 順位ソート
+				displayLeaderboard('score');
+				if (!thead.classList.contains('sort-desc')) {
+					removeSortMarker();
+					thead.classList.add('sort-desc');
+				}
+			}
+		}
+	})
+
+	function removeSortMarker() {
+		document.querySelectorAll('.leaderboard_sortableTable_head th').forEach(th => {
+			th.classList.remove('sort-asc');
+			th.classList.remove('sort-desc');
+		})
+	}
+})
+
 const config = {
 	type: Phaser.WEBGL,
 	width: 480,
@@ -338,7 +422,7 @@ const config = {
 			debug: false,
 		}
 	},
-	parent: 'game__wrap',
+	parent: 'gameWrap',
 	dom: {
 		createContainer: true,
 	},

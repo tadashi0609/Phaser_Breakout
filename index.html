@@ -11,14 +11,28 @@
 		<div class="header__wrap">
 			<h2 class="title">Breakout Game</h2>
 			<ul class="nav__list">
-				<li><a href="#">Repository</li>
+				<li><a href="#">Repository</a></li>
 				<li><a href="#">Portfolio</a></li>
 			</ul>
 		</div>
 	</header>
 
 	<main>
-		<div id="game__wrap"></div>
+		<div id="gameWrap"></div>
+		<div class="leaderboard">
+			<h2 class="leaderboard_title">スコアランキング</h2>
+			<table class="leaderboard_sortableTable">
+				<thead class="leaderboard_sortableTable_head">
+					<tr>
+						<th scope="col" class="leaderboard_sortableTable_head-sortable sort-desc">rank</th>
+						<th scope="col" class="">name</th>
+						<th scope="col" class="leaderboard_sortableTable_head-sortable">score</th>
+						<th scope="col" class="leaderboard_sortableTable_head-sortable">date</th>
+					</tr>
+				</thead>
+				<tbody id="leaderboard_sortableTable_body"></tbody>
+			</table>
+		</div>
 	</main>
 	
 	<script src="https://cdn.jsdelivr.net/npm/phaser@v3.90.0/dist/phaser.min.js"></script>
