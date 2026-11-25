@@ -366,7 +366,14 @@ function displayLeaderboard(key = 'score', isDesc = true) {
 		scores.forEach(values => {
 			exports += `<tr scope="row"><td>${values.rank}</td><td>${values.name}</td><td>${values.score}</td><td>`
 			const date = new Date(values.date);
-			exports += `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}</td></tr>`;
+			const options = {
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit',
+				hour: '2-digit',
+				minute: '2-digit',
+			};
+			exports += new Intl.DateTimeFormat('ja-JP', options).format(date);
 		});
 		document.getElementById('leaderboard_sortableTable_body').innerHTML = exports;
 	}
