@@ -12,41 +12,75 @@ main {
 /* ヘッダー */
 header {
     height: 60px;
-    background-color: sandybrown;
+    background-color: rgb(238, 167, 104)
 }
-header .header__wrap {
+header .header_wrap {
     width: 80%;
     display: flex;
+    flex-direction: row;
     justify-content: space-around;
     align-items: center;
 }
 header .title  {
     margin-left: auto;
 }
-header .nav__list {
+header .nav_list {
     display: flex;
     margin-left: auto;
     justify-content: flex-start;
     align-items: center;
     padding: 10px;
 }
-header .nav__list li {
+header .nav_list li {
     margin-left: 24px;
     list-style: none;
 }
-header .nav__list li a {
+header .nav_list li a {
     display: block;
     font-size: 20px;
 }
-div .header__wrap {
+div .header_wrap {
     height: 10vh;
 }
 
+/* スマホ用ヘッダー */
+@media screen and (max-width: 768px) {
+    header {
+        height: 90px;
+        width: auto;
+        display: block;
+        padding-top: 3%;
+    }
+    header .header_wrap {
+        width: 100%;
+        flex-direction: column;
+    }
+    header .title {
+        margin: 0 auto 0;
+    }
+    header .nav_list {
+        width: 100%;
+        margin: 0 auto 0;
+    }
+    header .nav_list li {
+        margin: 0;
+        width: 50%;
+    }
+    header .nav_list li a {
+        text-align: center;
+    }
+}
 
+
+/* ゲームキャンバス */
 canvas {
     height: 70vh;
     max-width: 90vw;
     max-height: 70vh;
+    @media screen and (max-width: 768px) {
+        width: 95vw;
+        max-width: 95vw;
+    }
 }
 
 
@@ -55,7 +89,9 @@ canvas {
     display: block;
     border: 1px solid #000;
     border-radius: 4px;
-    width: 60%;
+    width: 60vw;
+    max-width: 600px;
+    min-width: 500px;
     margin: 10px auto;
 }
 .leaderboard_title {
@@ -105,6 +141,18 @@ canvas {
 	cursor: pointer;
 }
 .leaderboard_sortableTable td {
-    border-top: 1px solid lightgray;
     border-bottom: 1px solid lightgray;
+}
+
+/* スマホ用リーダーボード */
+@media screen and (max-width: 768px) {
+    .leaderboard {
+        width: 95vw;
+        min-width: 95vw;
+        max-width: 95vw;
+        margin-top: 40px;
+    }
+    .leaderboard .leaderboard_sortableTable {
+        width: 90%;
+    }
 }

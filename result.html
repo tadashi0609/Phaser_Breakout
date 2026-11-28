@@ -3,42 +3,61 @@
         background-color: #f0f0f0;
         border: 1px solid #000;
         border-radius: 6px;
-        height: 180px;
+        height: auto;
         width: 240px;
 		margin-top: 0;
 		margin-bottom: 0;
     }
-    h3 {
-        background-color: sandybrown;
+    .result h3 {
+        background-color: rgb(247, 177, 117);
 		border-radius: 6px 6px 0 0;
 		padding: 6px;
 		margin-top: 0;
 		margin-bottom: 0;
+		padding-left: 1em;
     }
-    input[type="text"] {
+    .result input[type="text"] {
         border: 1px solid #000;
         border-radius: 4px;
         box-shadow: 0 1px #fff;
 		box-sizing: border-box;
-		height: 30px;
+		height: 40px;
 		margin: 14px 0 0 20px;
-		padding-left: 25px;
+		padding-left: 1em;
 		transition: box-shadow 0.3s;
 		width: 200px;
     }
-	input[type="button"] {
+	.result input[type="button"] {
 		width: 120px;
-		height: 27px;
+		height: 30px;
 		display: block;
 		margin: 14px 0 0 30px;
 		border: 1px solid #000;
 		border-radius: 4px;
 	}
+	@media screen and (max-width: 576px) {
+		.result {
+			width: 80vw;
+		}
+		.result h3 {
+			font-size: 24px;
+		}
+		.result input[type="text"] {
+			font-size: 18px;
+			width: 50vw;
+			height: 44px;
+			margin: 1em 10vw 0;
+		}
+		.result input[type="button"] {
+			height: 36px;
+			margin: 5% 0 2% 12vw;
+		}
+	}
 </style>
 
 <div class="result">
     <h3 id="scoreText">Score: </h3>
-    <input type="text" name="nameField" placeholder="名前を入力" maxlength="8" value="名無し"><br />
+    <input type="text" name="nameField" placeholder="名前を入力" maxlength="8" value="名無し" onfocus="this.select()"><br />
     <input type="button" name="submitButton" value="スコアを記録">
     <input type="button" name="cancelButton" value="記録しない"><br />
 </div>
