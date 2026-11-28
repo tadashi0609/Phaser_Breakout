@@ -100,7 +100,7 @@ canvas {
 }
 .leaderboard_sortableTable {
     table-layout: fixed;
-    width: 80%;
+    width: 85%;
     overflow-y: auto;
     border-collapse: collapse;
     margin: 10px auto;
@@ -110,6 +110,17 @@ canvas {
 .leaderboard_sortableTable_head {
     background-color: bisque;
     border: 1px solid bisque;
+}
+.leaderboard_sortableTable thead,
+.leaderboard_sortableTable tbody {
+    display: block;
+}
+.leaderboard_sortableTable tbody {
+    max-height: 160px;
+    overflow-y: auto;
+}
+.leaderboard_sortableTable tr {
+    display: flex;
 }
 .leaderboard_sortableTable tr :nth-child(1) {
 	text-align: center;
