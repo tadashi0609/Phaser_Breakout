@@ -30,7 +30,7 @@ class MainScene extends Phaser.Scene {
 	playing = false;
 	startText;
 
-	textStyle = { font: '18px Arial', fill: '#0095dd'};
+	textStyle = { font: '22px ui-serif', fill: '#0095dd'};
 	timerConfig = { delay: 30000, paused: true };
 
 	constructor() {
@@ -68,7 +68,7 @@ class MainScene extends Phaser.Scene {
 
 	create() {
 		this.physics.world.checkCollision.down = false;
-		this.physics.world.setBounds(0, 20, this.scale.width, this.scale.height - 20);
+		this.physics.world.setBounds(0, 25, this.scale.width, this.scale.height - 25);
 
 		this.paddle = new Paddle(this, this.scale.width / 2, this.scale.height - 70);
 
@@ -80,7 +80,7 @@ class MainScene extends Phaser.Scene {
 		this.livesText = this.add.text(
 			this.scale.width - 5,
 			5,
-			'Lives: ' + this.lives,
+			'Life: ' + this.lives,
 			this.textStyle,
 		);
 		this.livesText.setOrigin(1, 0);
@@ -190,8 +190,8 @@ class MainScene extends Phaser.Scene {
 
 		this.firstBall = this.ballGroup.initBall(this.paddle);
 
-		this.scoreText.setText('Points: ' + this.score);
-		this.livesText.setText('Lives: ' + this.lives);
+		this.scoreText.setText('Point: ' + this.score);
+		this.livesText.setText('Life: ' + this.lives);
 	}
 
 	loadNextLevel() {
@@ -263,7 +263,7 @@ class MainScene extends Phaser.Scene {
 			}
 
 			this.score += 10;
-			this.scoreText.setText('Points: ' + this.score);
+			this.scoreText.setText('Point: ' + this.score);
 		}
 	}
 
@@ -296,7 +296,7 @@ class MainScene extends Phaser.Scene {
 			this.paddle.isTimelinePlayed = this.paddle.powerupTimeline.isPlaying();
 			this.paddle.powerupTimeline.pause();
 
-			this.livesText.setText('Lives: ' + this.lives);
+			this.livesText.setText('Life: ' + this.lives);
 			this.lifeLostText.visible = true;
 			this.playing = false;
 
