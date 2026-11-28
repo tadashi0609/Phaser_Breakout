@@ -4,7 +4,7 @@ import { Powerup } from './powerup.js';
 import { Paddle } from './paddle.js';
 import { InputScene } from './inputScene.js';
 
-const MAX_LEVEL = 1;
+const MAX_LEVEL = 3;
 
 class MainScene extends Phaser.Scene {
 	paddle;
